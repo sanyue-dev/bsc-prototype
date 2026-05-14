@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>充电桩小程序原型</title>
+<style>
+  :root {
+    color-scheme: dark;
+  }
+  html, body {
+    margin: 0; padding: 0; min-height: 100%;
+    font-family: -apple-system, "PingFang SC", "Helvetica Neue", system-ui, sans-serif;
+    background:
+      radial-gradient(900px 600px at 12% 8%, rgba(46,91,255,0.06), transparent 60%),
+      radial-gradient(700px 500px at 92% 96%, rgba(0,153,255,0.06), transparent 60%),
+      #F4F7FC;
+    color: #0F1B36;
+    -webkit-font-smoothing: antialiased;
+  }
+  * { box-sizing: border-box; }
+  button { font: inherit; }
+  /* JetBrains-ish mono fallback for tabular data */
+  .mono { font-family: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, monospace; font-variant-numeric: tabular-nums; }
+  /* No native scrollbars inside the phone */
+  .noscroll::-webkit-scrollbar { width: 0; height: 0; }
+  /* Custom thin scroll for sidebar */
+  .thinscroll::-webkit-scrollbar { width: 6px; }
+  .thinscroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+  /* Subtle pulse / glow */
+  @keyframes pulseGlow {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50%      { opacity: 0.9; transform: scale(1.04); }
+  }
+  @keyframes ringSpin {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes barFill {
+    from { width: 0%; }
+  }
+  @keyframes scanLine {
+    0%   { transform: translateY(-100%); opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 1; }
+    100% { transform: translateY(100%); opacity: 0; }
+  }
+  @keyframes blink {
+    50% { opacity: 0.25; }
+  }
+  @keyframes dataTick {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+  }
+  .pulse-glow { animation: pulseGlow 2.4s ease-in-out infinite; }
+  .blink      { animation: blink 1.6s ease-in-out infinite; }
+  .data-tick  { animation: dataTick 2.2s ease-in-out infinite; }
+  /* chip */
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 11px; line-height: 1.2; letter-spacing: 0.02em;
+    border: 1px solid #E5EAF3;
+    background: #F4F7FC;
+    color: #5C6B89;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<!-- starters -->
+<script type="text/babel" src="ios-frame.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+
+<!-- shared UI + icons -->
+<script type="text/babel" src="ui.jsx"></script>
+
+<!-- owner screens -->
+<script type="text/babel" src="screens-core.jsx"></script>
+<script type="text/babel" src="screens-charging.jsx"></script>
+<script type="text/babel" src="screens-h5.jsx"></script>
+
+<!-- operator screens -->
+<script type="text/babel" src="screens-operator.jsx"></script>
+
+<!-- app shell -->
+<script type="text/babel" src="app.jsx"></script>
+
+<!-- defaults -->
+<script>
+  window.TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "theme": "tech",
+    "role": "owner"
+  }/*EDITMODE-END*/;
+</script>
+
+<script type="text/babel">
+  const root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(<App />);
+</script>
+</body>
+</html>
