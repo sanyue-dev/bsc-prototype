@@ -69,6 +69,50 @@ const THEMES = {
     immerseSurface: 'rgba(16,38,90,0.82)',
     immerseLine: 'rgba(110,200,255,0.22)',
   },
+  eco: { // 草绿·环保 — single accent, black/white/gray base
+    name: '环保绿',
+    bg0: '#F0F5F2', bg1: '#F5F8F6', bg2: '#FFFFFF',
+    surface: '#FFFFFF',
+    surfaceFlat: '#FFFFFF',
+    surfaceHi: '#FAFCFA',
+    surfaceTint: '#E4F1EA',
+    line: '#DCE8E1',
+    lineSoft: '#EBF2EE',
+    text: '#111816', textMuted: '#566961', textDim: '#96A69D',
+    primary: '#1A9E6E',
+    primary2: '#28B47E',
+    primaryDark: '#127A54',
+    glow: 'rgba(26,158,110,0.15)',
+    accent: '#1A9E6E',
+    success: '#1A9E6E',
+    warning: '#B07010',
+    danger: '#C43030',
+    immerseBg: '#060F0B',
+    immerseSurface: 'rgba(10,36,24,0.82)',
+    immerseLine: 'rgba(60,160,100,0.22)',
+  },
+  smartisan: { // 锤子OS风格 — Synkro蓝 + 纯白 + 深灰
+    name: '锤子',
+    bg0: '#EFEFEF', bg1: '#F7F7F7', bg2: '#FAFAFA',
+    surface: '#FFFFFF',
+    surfaceFlat: '#F7F7F7',
+    surfaceHi: '#FAFAFA',
+    surfaceTint: '#EAF2FF',
+    line: 'rgba(0,0,0,0.09)',
+    lineSoft: 'rgba(0,0,0,0.05)',
+    text: '#1A1A1A', textMuted: '#666666', textDim: '#999999',
+    primary: '#4A90D9',
+    primary2: '#5CA3E8',
+    primaryDark: '#3070B8',
+    glow: 'rgba(74,144,217,0.18)',
+    accent: '#4A90D9',
+    success: '#34C759',
+    warning: '#FF9500',
+    danger: '#FF3B30',
+    immerseBg: '#1A1A1A',
+    immerseSurface: 'rgba(44,44,44,0.94)',
+    immerseLine: 'rgba(255,255,255,0.08)',
+  },
 };
 
 // ─── status bar (microscopic WeChat style, white glyphs on dark) ───
@@ -122,43 +166,70 @@ function WeChatH5Header({ title, theme, onClose, onBack }) {
   );
 }
 
-// ─── native title bar (微信原生小程序 capsule + title) ────────────
-// onLight=true → use white text (good over a colored hero bg)
-function NativeTitleBar({ title, theme, onBack, onLight = false }) {
-  const tc = onLight ? '#fff' : theme.text;
-  const lc = onLight ? 'rgba(255,255,255,0.45)' : theme.line;
-  const muted = onLight ? 'rgba(255,255,255,0.85)' : theme.textMuted;
+// ─── native title bar ────────────────────────────────────────────
+// tabs: [{ id, label }] — renders pill segment control in the bar
+function NativeTitleBar({ title, theme, onBack, onLight = false, tabs, activeTab, onTab, right }) {
+  const bg = theme.bg1;
+  const tc = theme.text;
   return (
     <div style={{
-      height: 44, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      height: 44, display: 'flex', alignItems: 'center',
       padding: '0 12px', color: tc, position: 'relative', zIndex: 5,
+      background: bg, flexShrink: 0,
+      borderBottom: `1px solid ${theme.line}`,
     }}>
-      <div style={{ width: 88, display: 'flex' }}>
-        {onBack && (
-          <div onClick={onBack} style={{
-            display: 'inline-flex', alignItems: 'center', gap: 2, cursor: 'pointer',
-            color: tc, padding: '4px 4px',
-          }}>
-            <svg width="10" height="16" viewBox="0 0 10 16"><path d="M9 1L1 8l8 7" stroke="currentColor" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          </div>
-        )}
-      </div>
-      <div style={{ fontSize: 17, fontWeight: 600, letterSpacing: 0.4 }}>{title}</div>
-      {/* 微信 capsule */}
-      <div style={{
-        width: 88, height: 32, borderRadius: 16,
-        border: `1px solid ${lc}`,
-        background: onLight ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.03)',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-around',
-      }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          <span style={{ width: 3, height: 3, borderRadius: 999, background: muted }}/>
-          <span style={{ width: 3, height: 3, borderRadius: 999, background: muted }}/>
-          <span style={{ width: 3, height: 3, borderRadius: 999, background: muted }}/>
+      {/* left: back button or spacer */}
+      {onBack ? (
+        <div onClick={onBack} style={{
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          width: 32, height: 32, cursor: 'pointer', color: tc, zIndex: 1,
+        }}>
+          <svg width="9" height="15" viewBox="0 0 9 15">
+            <path d="M8 1L1 7.5 8 14" stroke="currentColor" strokeWidth="1.6" fill="none"
+              strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
         </div>
-        <div style={{ width: 1, height: 14, background: lc }}/>
-        <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.4" stroke={tc} strokeWidth="1.4" fill="none"/></svg>
-      </div>
+      ) : <div style={{ width: 32 }}/>}
+
+      {/* pill tabs or centered title */}
+      {tabs ? (
+        <div style={{
+          position: 'absolute', left: 0, right: 0, display: 'flex',
+          alignItems: 'center', justifyContent: 'center', gap: 2,
+          pointerEvents: 'none',
+        }}>
+          <div style={{
+            display: 'flex', gap: 2,
+            background: theme.bg0,
+            borderRadius: 999, padding: '3px',
+            border: `1px solid ${theme.line}`,
+            pointerEvents: 'all',
+          }}>
+            {tabs.map(t => (
+              <div key={t.id} onClick={() => onTab && onTab(t.id)} style={{
+                padding: '3px 14px', borderRadius: 999, cursor: 'pointer',
+                background: activeTab === t.id ? theme.primary : 'transparent',
+                color: activeTab === t.id ? '#ffffff' : theme.textMuted,
+                fontSize: 13, fontWeight: 600,
+                transition: 'all .15s',
+              }}>{t.label}</div>
+            ))}
+          </div>
+        </div>
+      ) : title && (
+        <div style={{
+          position: 'absolute', left: 0, right: 0, textAlign: 'center',
+          fontSize: 17, fontWeight: 700, color: tc,
+          letterSpacing: 0.2, pointerEvents: 'none',
+        }}>{title}</div>
+      )}
+
+      {/* right: flex spacer or custom slot */}
+      <div style={{ flex: 1 }}/>
+      {right && (
+        <div style={{ position: 'relative', zIndex: 1 }}>{right}</div>
+      )}
+      {!right && <div style={{ width: 32 }}/>}
     </div>
   );
 }
@@ -184,32 +255,43 @@ function KindBadge({ kind, theme }) {
   );
 }
 
-// ─── tab bar (车主端底部) ─────────────────────────────────────────
+// ─── tab bar (车主端底部 · 5项) ──────────────────────────────────
 function TabBar({ active, onTab, theme }) {
-  const tabs = [
-    { id: 'home', label: '充电', icon: 'bolt' },
-    { id: 'map', label: '地图', icon: 'pin' },
-    { id: 'orders', label: '订单', icon: 'list' },
-    { id: 'profile', label: '我的', icon: 'user' },
+  const allTabs = [
+    { id: 'home',    label: '首页',  icon: 'home' },
+    { id: 'savings', label: '省钱',  icon: 'coupon' },
+    { id: 'scan',    label: '扫一扫', icon: 'scan' },
+    { id: 'shop',    label: '商城',  icon: 'shop' },
+    { id: 'profile', label: '我的',  icon: 'user' },
   ];
   return (
     <div style={{
-      height: 64, paddingBottom: 14,
-      display: 'flex', alignItems: 'flex-start',
+      height: 56,
+      display: 'flex', alignItems: 'stretch',
       background: '#FFFFFF',
-      borderTop: `1px solid ${theme.line}`,
-      boxShadow: '0 -2px 14px -8px rgba(15,27,54,0.06)',
+      borderTop: '1px solid rgba(0,0,0,0.09)',
     }}>
-      {tabs.map(t => {
+      {allTabs.map(t => {
         const on = active === t.id;
         return (
           <div key={t.id} onClick={() => onTab(t.id)} style={{
-            flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-            paddingTop: 6, cursor: 'pointer',
-            color: on ? theme.primary : theme.textDim,
+            flex: 1,
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+            gap: 3,
+            cursor: 'pointer',
+            background: 'transparent',
+                        paddingBottom: 4,
           }}>
-            <Icon name={t.icon} size={22} color="currentColor" filled={on}/>
-            <span style={{ fontSize: 10, fontWeight: on ? 700 : 500 }}>{t.label}</span>
+            {/* icon with blue stroke circle when active */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32 }}>
+              <Icon name={t.icon} size={22} color={on ? theme.primary : '#BBBBBB'} filled={on}/>
+            </div>
+            <span style={{
+              fontSize: 10, fontWeight: on ? 600 : 400,
+              color: on ? theme.primary : '#BBBBBB',
+              letterSpacing: 0.1,
+            }}>{t.label}</span>
           </div>
         );
       })}
@@ -227,22 +309,26 @@ function OperatorTabBar({ active, onTab, theme }) {
   ];
   return (
     <div style={{
-      height: 64, paddingBottom: 14,
-      display: 'flex', alignItems: 'flex-start',
+      height: 56,
+      display: 'flex', alignItems: 'stretch',
       background: '#FFFFFF',
-      borderTop: `1px solid ${theme.line}`,
-      boxShadow: '0 -2px 14px -8px rgba(15,27,54,0.06)',
+      borderTop: '1px solid rgba(0,0,0,0.09)',
     }}>
       {tabs.map(t => {
         const on = active === t.id;
         return (
           <div key={t.id} onClick={() => onTab(t.id)} style={{
-            flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-            paddingTop: 6, cursor: 'pointer',
-            color: on ? theme.primary : theme.textDim,
+            flex: 1,
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+            gap: 3, cursor: 'pointer',
+            background: 'transparent',
+                        paddingBottom: 4,
           }}>
-            <Icon name={t.icon} size={22} color="currentColor" filled={on}/>
-            <span style={{ fontSize: 10, fontWeight: on ? 700 : 500 }}>{t.label}</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32 }}>
+              <Icon name={t.icon} size={22} color={on ? theme.primary : '#BBBBBB'} filled={on}/>
+            </div>
+            <span style={{ fontSize: 10, fontWeight: on ? 600 : 400, color: on ? theme.primary : '#BBBBBB' }}>{t.label}</span>
           </div>
         );
       })}
@@ -452,6 +538,18 @@ function Icon({ name, size = 20, color = 'currentColor', filled = false, glow = 
         <path d="M5 18l5-5 4 4 3-3 4 4" stroke={color} strokeWidth={sw} fill="none" strokeLinejoin="round"/>
       </>
     );
+    case 'home': return wrap(
+      <>
+        <path d="M3 11.5L12 4l9 7.5" stroke={color} strokeWidth={sw} fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M5 10v11h5v-5h4v5h5V10" fill={filled ? color : 'none'} stroke={color} strokeWidth={sw} strokeLinejoin="round"/>
+      </>
+    );
+    case 'shop': return wrap(
+      <>
+        <rect x="3" y="7" width="18" height="14" rx="2" fill={filled ? color : 'none'} stroke={color} strokeWidth={sw}/>
+        <path d="M8 7V5a4 4 0 018 0v2" stroke={color} strokeWidth={sw} fill="none" strokeLinecap="round"/>
+      </>
+    );
     default: return null;
   }
 }
@@ -459,8 +557,8 @@ function Icon({ name, size = 20, color = 'currentColor', filled = false, glow = 
 // ─── primitive: button ───────────────────────────────────────────
 function Button({ children, kind = 'primary', theme, onClick, full, style, disabled }) {
   const base = {
-    height: 44, padding: '0 20px', borderRadius: 12,
-    fontSize: 15, fontWeight: 600, letterSpacing: 0.5,
+    height: 46, padding: '0 22px', borderRadius: 8,
+    fontSize: 15, fontWeight: 600, letterSpacing: 0.3,
     display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
     border: 'none', cursor: disabled ? 'not-allowed' : 'pointer',
     transition: 'transform .1s ease',
@@ -471,27 +569,27 @@ function Button({ children, kind = 'primary', theme, onClick, full, style, disab
     primary: {
       ...base,
       color: '#fff',
-      background: `linear-gradient(180deg, ${theme.primary2}, ${theme.primary})`,
-      boxShadow: `0 10px 22px -10px ${theme.glow}, inset 0 1px 0 rgba(255,255,255,0.22)`,
+      background: theme.primary,
+      boxShadow: 'none',
     },
     ghost: {
       ...base,
       color: theme.text,
-      background: '#fff',
+      background: theme.surface,
       border: `1px solid ${theme.line}`,
-      boxShadow: '0 1px 2px rgba(15,27,54,0.04)',
+      boxShadow: 'none',
     },
     accent: {
       ...base,
       color: '#fff',
       background: theme.accent,
-      boxShadow: `0 10px 22px -10px ${theme.accent}80`,
+      boxShadow: 'none',
     },
     danger: {
       ...base,
       color: '#fff',
       background: theme.danger,
-      boxShadow: `0 10px 22px -10px ${theme.danger}66`,
+      boxShadow: 'none',
     },
   };
   return <button onClick={onClick} disabled={disabled} style={{ ...styles[kind], ...style }}>{children}</button>;
@@ -503,11 +601,8 @@ function Card({ children, theme, style, padded = true, glow = false, onClick }) 
     <div onClick={onClick} style={{
       background: theme.surface,
       border: `1px solid ${theme.line}`,
-      borderRadius: 16,
+      borderRadius: 10,
       padding: padded ? 16 : 0,
-      boxShadow: glow
-        ? `0 14px 30px -16px ${theme.glow}, 0 2px 6px rgba(15,27,54,0.04)`
-        : '0 2px 6px rgba(15,27,54,0.04)',
       ...style,
     }}>
       {children}
@@ -537,9 +632,9 @@ function SectionTitle({ children, theme, right }) {
   return (
     <div style={{
       display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
-      padding: '14px 18px 8px',
+      padding: '16px 18px 8px',
     }}>
-      <div style={{ fontSize: 13, fontWeight: 600, color: theme.text, letterSpacing: 0.5 }}>{children}</div>
+      <div style={{ fontSize: 14, fontWeight: 700, color: theme.text, letterSpacing: 0 }}>{children}</div>
       {right && <div style={{ fontSize: 12, color: theme.textMuted }}>{right}</div>}
     </div>
   );
@@ -552,17 +647,9 @@ function GridBg({ theme, height = 200, children, style, tinted = false }) {
     return (
       <div style={{
         position: 'relative', height, overflow: 'hidden',
-        background: `linear-gradient(135deg, ${theme.primary2} 0%, ${theme.primary} 100%)`,
+        background: theme.primary,
         ...style,
       }}>
-        <svg width="100%" height="100%" style={{ position: 'absolute', inset: 0, opacity: 0.5 }}>
-          <defs>
-            <pattern id="gridT" width="32" height="32" patternUnits="userSpaceOnUse">
-              <path d="M32 0H0V32" fill="none" stroke="#fff" strokeOpacity="0.18" strokeWidth="1"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#gridT)"/>
-        </svg>
         <div style={{ position: 'relative' }}>{children}</div>
       </div>
     );
@@ -570,17 +657,9 @@ function GridBg({ theme, height = 200, children, style, tinted = false }) {
   return (
     <div style={{
       position: 'relative', height, overflow: 'hidden',
-      background: `linear-gradient(180deg, ${theme.surfaceTint} 0%, ${theme.bg1} 100%)`,
+      background: theme.bg0,
       ...style,
     }}>
-      <svg width="100%" height="100%" style={{ position: 'absolute', inset: 0, opacity: 0.7 }}>
-        <defs>
-          <pattern id="gridL" width="32" height="32" patternUnits="userSpaceOnUse">
-            <path d="M32 0H0V32" fill="none" stroke={theme.line} strokeWidth="1"/>
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#gridL)"/>
-      </svg>
       <div style={{ position: 'relative' }}>{children}</div>
     </div>
   );

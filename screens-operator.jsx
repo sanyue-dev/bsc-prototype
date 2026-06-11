@@ -28,14 +28,10 @@ function OpDashboardScreen({ theme, nav }) {
         <div style={{ padding: '14px 16px 0' }}>
           <Card theme={theme} padded={false} glow style={{
             padding: 18,
-            background: `linear-gradient(135deg, ${theme.primary2} 0%, ${theme.primary} 60%, ${theme.primaryDark} 100%)`,
-            border: '1px solid rgba(255,255,255,0.18)',
+            background: theme.primary,
+            border: 'none',
             position: 'relative', overflow: 'hidden',
           }}>
-            <svg style={{ position: 'absolute', right: -20, top: -20, opacity: 0.18 }} width="180" height="180" viewBox="0 0 180 180">
-              <path d="M10 170 Q40 100 80 120 T150 60 T170 10" stroke="#fff" strokeWidth="1.5" fill="none"/>
-              <path d="M10 170 Q40 130 80 140 T150 90 T170 30" stroke="#fff" strokeWidth="1" fill="none" opacity="0.6"/>
-            </svg>
             <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', letterSpacing: 1, fontWeight: 700 }}>TODAY · 截至 12:00</div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 6 }}>
               <span className="mono" style={{ fontSize: 38, fontWeight: 800, color: '#fff' }}>¥1,284</span>
@@ -50,7 +46,6 @@ function OpDashboardScreen({ theme, nav }) {
                 <div key={i} style={{
                   flex: 1, height: h, borderRadius: 2,
                   background: i >= 8 ? '#fff' : 'rgba(255,255,255,0.45)',
-                  boxShadow: i >= 8 ? `0 0 8px ${theme.glow}` : 'none',
                 }}/>
               ))}
             </div>
@@ -94,11 +89,10 @@ function OpDashboardScreen({ theme, nav }) {
                   <span style={{ flex: 1, fontSize: 13, color: theme.text }}>{r.name}</span>
                   <span className="mono" style={{ fontSize: 13, color: theme.text, fontWeight: 700 }}>¥{r.v}</span>
                 </div>
-                <div style={{ marginTop: 6, height: 4, background: '#F4F7FC', borderRadius: 999, overflow: 'hidden' }}>
+                <div style={{ marginTop: 6, height: 4, background: theme.bg0, borderRadius: 999, overflow: 'hidden' }}>
                   <div style={{
                     width: `${r.b}%`, height: '100%',
-                    background: `linear-gradient(90deg, ${theme.primary}, ${theme.accent})`,
-                    boxShadow: `0 0 6px ${theme.glow}`,
+                    background: theme.primary,
                   }}/>
                 </div>
               </div>
@@ -171,7 +165,7 @@ function OpStationsScreen({ theme, nav }) {
   ];
   return (
     <>
-      <NativeTitleBar title="站点管理" theme={theme} right/>
+      <NativeTitleBar title="站点管理" theme={theme}/>
       <ScreenBody theme={theme}>
         {/* search */}
         <div style={{ padding: '8px 16px 0' }}>
@@ -205,7 +199,7 @@ function OpStationsScreen({ theme, nav }) {
             return (
               <span key={f} onClick={() => setFilter(f)} className="chip" style={{
                 cursor: 'pointer', whiteSpace: 'nowrap',
-                background: on ? `${theme.primary}30` : 'rgba(255,255,255,0.04)',
+                background: on ? theme.primary : theme.surface,
                 borderColor: on ? theme.primary : theme.line,
                 color: on ? '#fff' : theme.textMuted, fontWeight: on ? 700 : 500,
               }}>{f}</span>
@@ -222,7 +216,7 @@ function OpStationsScreen({ theme, nav }) {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ width: 8, height: 8, borderRadius: 999, background: tone, boxShadow: `0 0 6px ${tone}` }}/>
+                      <span style={{ width: 8, height: 8, borderRadius: 999, background: tone }}/>
                       <span style={{ fontSize: 14, fontWeight: 700, color: theme.text }}>{s.name}</span>
                       {s.alert > 0 && (
                         <span className="chip" style={{ background: `${tone}20`, color: tone, borderColor: `${tone}55` }}>
@@ -240,7 +234,7 @@ function OpStationsScreen({ theme, nav }) {
                       </div>
                       <div>
                         <div style={{ fontSize: 10, color: theme.textMuted }}>今日收益</div>
-                        <div className="mono" style={{ fontSize: 13, color: theme.accent, fontWeight: 600, marginTop: 2 }}>{s.rev}</div>
+                        <div className="mono" style={{ fontSize: 13, color: theme.text, fontWeight: 600, marginTop: 2 }}>{s.rev}</div>
                       </div>
                       <div>
                         <div style={{ fontSize: 10, color: theme.textMuted }}>利用率</div>
@@ -279,7 +273,7 @@ function OpDevicesScreen({ theme, nav }) {
               <div>
                 <div style={{ fontSize: 11, color: theme.accent, letterSpacing: 1, fontWeight: 700 }}>LIVE · 当前在线</div>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 6 }}>
-                  <span className="mono" style={{ fontSize: 30, fontWeight: 800, color: '#fff' }}>187</span>
+                  <span className="mono" style={{ fontSize: 30, fontWeight: 800, color: theme.text }}>187</span>
                   <span style={{ fontSize: 13, color: theme.textMuted }}>/ 190 设备</span>
                 </div>
                 <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 4 }}>当前正在充电 142 台 · 空闲 45 台</div>
@@ -302,7 +296,6 @@ function OpDevicesScreen({ theme, nav }) {
                   <div key={i} style={{
                     aspectRatio: '1/1', borderRadius: 2,
                     background: `${c}${s === 'off' ? '40' : '88'}`,
-                    boxShadow: s === 'err' ? `0 0 4px ${c}` : 'none',
                     transition: 'background .8s ease',
                   }}/>
                 );
@@ -323,10 +316,10 @@ function OpDevicesScreen({ theme, nav }) {
           <Card theme={theme}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
               <div>
-                <div className="mono" style={{ fontSize: 26, fontWeight: 800, color: theme.accent }}>184.6</div>
+                <div className="mono" style={{ fontSize: 26, fontWeight: 800, color: theme.text }}>184.6</div>
                 <div style={{ fontSize: 11, color: theme.textMuted }}>kW · 总输出功率</div>
               </div>
-              <span className="chip" style={{ background: `${theme.accent}15`, color: theme.accent, borderColor: `${theme.accent}55` }}>
+              <span className="chip" style={{ background: `${theme.accent}15`, color: theme.textMuted, borderColor: theme.line }}>
                 <span className="data-tick">●</span> 实时
               </span>
             </div>
@@ -364,7 +357,8 @@ function OpDevicesScreen({ theme, nav }) {
                 <span style={{ fontSize: 10, color: theme.textDim }}>{d.t}</span>
                 <div style={{
                   marginTop: 6, padding: '3px 10px', borderRadius: 999,
-                  background: `${theme.primary}30`, color: '#fff',
+                  background: theme.surfaceTint, color: theme.primary,
+                  border: `1px solid ${theme.primary}55`,
                   fontSize: 11, fontWeight: 600, cursor: 'pointer',
                 }}>派单</div>
               </div>
@@ -397,11 +391,9 @@ function LineChart({ theme, tick }) {
         <line key={y} x1="0" y1={H * y} x2={W} y2={H * y} stroke={theme.line} strokeWidth="0.5" strokeDasharray="2 4"/>
       ))}
       <path d={da} fill="url(#lcFill)"/>
-      <path d={d} stroke={theme.accent} strokeWidth="2" fill="none" strokeLinejoin="round"
-        style={{ filter: `drop-shadow(0 0 6px ${theme.accent}88)` }}/>
+      <path d={d} stroke={theme.accent} strokeWidth="2" fill="none" strokeLinejoin="round"/>
       {/* leading dot */}
       <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r="4" fill={theme.accent}/>
-      <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r="8" fill={theme.accent} opacity="0.25" className="pulse-glow"/>
       {/* axis labels */}
       {['00', '06', '12', '18', '24'].map((t, i) => (
         <text key={t} x={i * W / 4} y={H + 14} fill={theme.textDim} fontSize="9" textAnchor={i === 0 ? 'start' : i === 4 ? 'end' : 'middle'}>{t}</text>
@@ -436,7 +428,7 @@ function OpTicketsScreen({ theme, nav }) {
             return (
               <span key={t} onClick={() => setTab(t)} className="chip" style={{
                 cursor: 'pointer', whiteSpace: 'nowrap',
-                background: on ? `${theme.primary}30` : 'rgba(255,255,255,0.04)',
+                background: on ? theme.primary : theme.surface,
                 borderColor: on ? theme.primary : theme.line,
                 color: on ? '#fff' : theme.textMuted, fontWeight: on ? 700 : 500,
               }}>{t}</span>
@@ -508,6 +500,177 @@ function TicketStat({ theme, v, l, tint }) {
   );
 }
 
-Object.assign(window, {
-  OpDashboardScreen, OpStationsScreen, OpDevicesScreen, OpTicketsScreen,
-});
+// ─── OpPricingScreen ──────────────────────────────────────────────
+function OpPricingScreen({ theme, nav }) {
+  const { useState, useMemo } = React;
+
+  const TIERS = [
+    { label: '档位一', range: '0–100W' },
+    { label: '档位二', range: '101–200W' },
+    { label: '档位三', range: '201–300W' },
+    { label: '档位四', range: '301–400W' },
+  ];
+  const PRESET_CYCLES = [3, 5, 6, 10];
+
+  const [cycle, setCycle] = useState(6);
+  const [customVal, setCustomVal] = useState('');
+  const [inputAmts, setInputAmts] = useState(['0.04', '0.05', '0.06', '0.07']);
+  const [fenAmts, setFenAmts] = useState([4, 5, 6, 7]);
+  const [saved, setSaved] = useState(false);
+
+  function handleCycle(n) { setCycle(n); setCustomVal(''); setSaved(false); }
+  function handleCustom(v) {
+    setCustomVal(v);
+    const n = parseInt(v);
+    if (!isNaN(n) && n > 0 && n <= 60) { setCycle(n); setSaved(false); }
+  }
+  function handleAmt(i, v) {
+    const next = [...inputAmts]; next[i] = v; setInputAmts(next);
+    const fen = Math.round(parseFloat(v) * 100);
+    if (!isNaN(fen) && fen > 0) { const nf = [...fenAmts]; nf[i] = fen; setFenAmts(nf); }
+    setSaved(false);
+  }
+
+  const hourly = useMemo(() =>
+    fenAmts.map(f => ((60 / cycle) * f / 100).toFixed(2)), [fenAmts, cycle]);
+
+  const inputStyle = {
+    width: 72, padding: '6px 8px', borderRadius: 8,
+    border: `1px solid ${theme.line}`, background: theme.bg0,
+    color: theme.text, fontSize: 14, fontWeight: 700,
+    fontFamily: 'monospace', textAlign: 'right', outline: 'none',
+  };
+
+  return (
+    <>
+      <NativeTitleBar title="计费配置" theme={theme}/>
+      <ScreenBody theme={theme}>
+        <div style={{ padding: '14px 16px 32px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+          {/* ① cycle picker */}
+          <SectionTitle theme={theme}>计费周期（分钟）</SectionTitle>
+          <Card theme={theme}>
+            <div style={{ fontSize: 12, color: theme.textMuted, marginBottom: 12, lineHeight: 1.6 }}>
+              每满 <span className="mono" style={{ color: theme.accent, fontWeight: 700 }}>{cycle}</span> 分钟
+              扣一次服务费；不足一个周期按一个周期计。
+            </div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {PRESET_CYCLES.map(p => {
+                const on = cycle === p && !customVal;
+                return (
+                  <div key={p} onClick={() => handleCycle(p)} style={{
+                    padding: '8px 16px', borderRadius: 999, cursor: 'pointer',
+                    background: on ? theme.primary : theme.surface,
+                    border: `1.5px solid ${on ? theme.primary : theme.line}`,
+                    transition: 'all .15s',
+                  }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: on ? '#fff' : theme.text }}>{p} 分钟</span>
+                  </div>
+                );
+              })}
+              {/* custom input */}
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '6px 12px', borderRadius: 999,
+                background: customVal ? theme.primary : theme.surface,
+                border: `1.5px solid ${customVal ? theme.primary : theme.line}`,
+              }}>
+                <input
+                  type="number" min="1" max="60" placeholder="自定义"
+                  value={customVal}
+                  onChange={e => handleCustom(e.target.value)}
+                  style={{
+                    width: 52, background: 'transparent', border: 'none', outline: 'none',
+                    color: customVal ? '#fff' : theme.textMuted,
+                    fontSize: 13, fontWeight: 700, fontFamily: 'monospace', textAlign: 'center',
+                  }}
+                />
+                <span style={{ fontSize: 12, color: customVal ? 'rgba(255,255,255,0.8)' : theme.textDim }}>分钟</span>
+              </div>
+            </div>
+          </Card>
+
+          {/* ② per-cycle amount */}
+          <SectionTitle theme={theme}>各档位每周期服务费</SectionTitle>
+          <Card theme={theme} padded={false}>
+            {/* header */}
+            <div style={{
+              display: 'grid', gridTemplateColumns: '1fr auto auto',
+              padding: '8px 16px', borderBottom: `1px solid ${theme.line}`,
+              gap: 12,
+            }}>
+              {['档位 · 功率', `每 ${cycle} 分钟`, '≈ 时价'].map(h => (
+                <span key={h} style={{ fontSize: 10, color: theme.textDim, fontWeight: 600, textAlign: h !== '档位 · 功率' ? 'right' : 'left' }}>{h}</span>
+              ))}
+            </div>
+            {TIERS.map((t, i) => (
+              <div key={t.label} style={{
+                display: 'grid', gridTemplateColumns: '1fr auto auto',
+                padding: '12px 16px', alignItems: 'center', gap: 12,
+                borderBottom: i < 3 ? `1px solid ${theme.line}` : 'none',
+              }}>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: theme.text }}>{t.label}</div>
+                  <div style={{ fontSize: 10, color: theme.textDim }}>{t.range}</div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                  <span style={{ fontSize: 12, color: theme.textMuted }}>¥</span>
+                  <input type="number" step="0.01" min="0.01"
+                    value={inputAmts[i]}
+                    onChange={e => handleAmt(i, e.target.value)}
+                    style={inputStyle}
+                  />
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <span style={{ fontSize: 10, color: theme.textDim }}>约 </span>
+                  <span className="mono" style={{ fontSize: 13, fontWeight: 700, color: theme.accent }}>¥{hourly[i]}</span>
+                  <span style={{ fontSize: 10, color: theme.textDim }}>/h</span>
+                </div>
+              </div>
+            ))}
+          </Card>
+
+          {/* ③ billing rule preview */}
+          <SectionTitle theme={theme}>计费规则预览</SectionTitle>
+          <Card theme={theme} padded={false}>
+            {[1, 2, 3, 4].map((mult, i, a) => {
+              const mins = mult * cycle;
+              const overMins = mult * cycle - 1;
+              return (
+                <div key={mult} style={{
+                  padding: '11px 16px', borderBottom: i < a.length - 1 ? `1px solid ${theme.line}` : 'none',
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                }}>
+                  <span style={{ fontSize: 12, color: theme.textMuted }}>
+                    {overMins === 0 ? '≤' : `${(mult-1)*cycle}–`}{mins} 分钟
+                  </span>
+                  <span style={{ fontSize: 12, color: theme.text }}>
+                    按 <span className="mono" style={{ color: theme.accent, fontWeight: 700 }}>{mult}</span> 个周期计费
+                  </span>
+                </div>
+              );
+            })}
+            <div style={{ padding: '11px 16px', fontSize: 11, color: theme.textDim }}>
+              以此类推……不足一个周期，向上取整
+            </div>
+          </Card>
+
+          {/* ④ save */}
+          <Button kind={saved ? 'ghost' : 'primary'} theme={theme} full onClick={() => setSaved(true)}>
+            {saved
+              ? <><Icon name="check" size={16} color={theme.success}/> 已保存</>
+              : '保存计费配置'}
+          </Button>
+          {saved && (
+            <div style={{ fontSize: 11, color: theme.textMuted, textAlign: 'center', marginTop: -8 }}>
+              计费规则将在下次开启充电时随会话生效
+            </div>
+          )}
+        </div>
+      </ScreenBody>
+      <OperatorTabBar active="op-pricing" onTab={nav} theme={theme}/>
+    </>
+  );
+}
+
+

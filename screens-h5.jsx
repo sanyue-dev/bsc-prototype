@@ -4,6 +4,7 @@
 // ─── WalletScreen — 钱包/余额/充值 ────────────────────────────────
 function WalletScreen({ theme, nav }) {
   const [amt, setAmt] = React.useState('50');
+  const [customAmt, setCustomAmt] = React.useState('');
   const packs = [
     { v: '20', bonus: null },
     { v: '50', bonus: '送3元', hot: true },
@@ -12,24 +13,19 @@ function WalletScreen({ theme, nav }) {
   ];
   return (
     <>
-      <WeChatH5Header title="我的钱包" theme={theme} onBack={() => nav('profile')}/>
+      <NativeTitleBar title="我的钱包" theme={theme} onBack={() => nav('profile')}/>
       <ScreenBody theme={theme}>
         {/* balance hero */}
         <div style={{ padding: '14px 16px 0' }}>
-          <Card theme={theme} padded={false} glow style={{
+          <Card theme={theme} padded={false} style={{
             padding: '20px 20px 16px', position: 'relative', overflow: 'hidden',
-            background: `linear-gradient(135deg, ${theme.primary2} 0%, ${theme.primary} 50%, ${theme.primaryDark} 100%)`,
-            border: '1px solid rgba(255,255,255,0.18)',
+            background: theme.primary,
+            border: 'none',
           }}>
             {/* decorative ring */}
-            <svg style={{ position: 'absolute', top: -40, right: -40, opacity: 0.25 }} width="160" height="160" viewBox="0 0 160 160">
-              <circle cx="80" cy="80" r="60" stroke="#fff" strokeWidth="1.5" fill="none" strokeDasharray="2 4"/>
-              <circle cx="80" cy="80" r="40" stroke="#fff" strokeWidth="1" fill="none"/>
-            </svg>
             <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)' }}>账户余额（元）</div>
             <div className="mono" style={{
               fontSize: 44, fontWeight: 800, color: '#fff', marginTop: 4, letterSpacing: -1,
-              textShadow: '0 4px 18px rgba(0,0,0,0.3)',
             }}>28.40</div>
             <div style={{ marginTop: 10, display: 'flex', gap: 8 }}>
               <span style={{
@@ -57,17 +53,16 @@ function WalletScreen({ theme, nav }) {
             {packs.map(p => {
               const on = amt === p.v;
               return (
-                <div key={p.v} onClick={() => setAmt(p.v)} style={{
+                <div key={p.v} onClick={() => { setAmt(p.v); setCustomAmt(''); }} style={{
                   position: 'relative', padding: '14px 14px', borderRadius: 14, cursor: 'pointer',
-                  background: on ? `${theme.primary}28` : theme.surface,
+                  background: on ? theme.primary : theme.surface,
                   border: `1.5px solid ${on ? theme.primary : theme.line}`,
-                  boxShadow: on ? `0 10px 24px -10px ${theme.glow}` : 'none',
                 }}>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-                    <span className="mono" style={{ fontSize: 24, fontWeight: 800, color: '#fff' }}>¥{p.v}</span>
+                    <span className="mono" style={{ fontSize: 24, fontWeight: 800, color: on ? '#fff' : theme.text }}>¥{p.v}</span>
                   </div>
                   {p.bonus && (
-                    <div style={{ fontSize: 11, color: theme.accent, marginTop: 6 }}>{p.bonus}</div>
+                    <div style={{ fontSize: 11, color: on ? 'rgba(255,255,255,0.85)' : theme.accent, marginTop: 6 }}>{p.bonus}</div>
                   )}
                   {p.hot && (
                     <span style={{
@@ -82,12 +77,23 @@ function WalletScreen({ theme, nav }) {
           </div>
 
           {/* custom amount */}
-          <Card theme={theme} padded={false} style={{ marginTop: 12, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <Card theme={theme} padded={false} style={{ marginTop: 12, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10, border: `1.5px solid ${customAmt ? theme.primary : theme.line}` }}>
             <span className="mono" style={{ fontSize: 18, color: theme.textMuted }}>¥</span>
-            <input value="" placeholder="自定义金额，最低 5 元" style={{
-              flex: 1, background: 'transparent', border: 'none', outline: 'none',
-              color: theme.text, fontSize: 15,
-            }} onChange={() => {}}/>
+            <input
+              value={customAmt}
+              placeholder="自定义金额，最低 5 元"
+              type="number"
+              inputMode="decimal"
+              style={{
+                flex: 1, background: 'transparent', border: 'none', outline: 'none',
+                color: theme.text, fontSize: 15,
+              }}
+              onChange={e => {
+                const v = e.target.value;
+                setCustomAmt(v);
+                if (v) setAmt(v);
+              }}
+            />
           </Card>
 
           {/* pay method */}
@@ -110,7 +116,7 @@ function WalletScreen({ theme, nav }) {
           </Card>
 
           <Button kind="primary" theme={theme} full style={{ marginTop: 14 }}>
-            充值 ¥{amt}.00
+            充值 ¥{parseFloat(amt) > 0 ? parseFloat(amt).toFixed(2) : '--'}
           </Button>
         </div>
 
@@ -130,7 +136,7 @@ function WalletScreen({ theme, nav }) {
               }}>
                 <div style={{
                   width: 32, height: 32, borderRadius: 8,
-                  background: r.sign === 'in' ? `${theme.success}20` : 'rgba(255,255,255,0.05)',
+                  background: r.sign === 'in' ? `${theme.success}20` : theme.bg0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 12,
                 }}>
                   <Icon name={r.sign === 'in' ? 'plus' : 'minus'} size={14}
@@ -142,7 +148,7 @@ function WalletScreen({ theme, nav }) {
                 </div>
                 <div className="mono" style={{
                   fontSize: 15, fontWeight: 700,
-                  color: r.sign === 'in' ? theme.success : theme.text,
+                  color: theme.text,
                 }}>{r.amt}</div>
               </div>
             ))}
@@ -158,7 +164,7 @@ function CouponsScreen({ theme, nav }) {
   const [tab, setTab] = React.useState('coupons');
   return (
     <>
-      <WeChatH5Header title="优惠券 / 月卡" theme={theme} onBack={() => nav('profile')}/>
+      <NativeTitleBar title="优惠券 / 月卡" theme={theme} onBack={() => nav('profile')}/>
       <ScreenBody theme={theme}>
         {/* tabs */}
         <div style={{ display: 'flex', gap: 6, padding: '12px 16px' }}>
@@ -171,7 +177,7 @@ function CouponsScreen({ theme, nav }) {
             return (
               <span key={x.id} onClick={() => setTab(x.id)} className="chip" style={{
                 cursor: 'pointer',
-                background: on ? `${theme.primary}30` : 'rgba(255,255,255,0.04)',
+                background: on ? theme.primary : '#fff',
                 borderColor: on ? theme.primary : theme.line,
                 color: on ? '#fff' : theme.textMuted, fontWeight: on ? 700 : 500,
               }}>{x.t} {x.n != null && `· ${x.n}`}</span>
@@ -189,13 +195,10 @@ function CouponsScreen({ theme, nav }) {
           <div style={{ padding: '0 16px 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
             <Card theme={theme} padded={false} glow style={{
               padding: 18,
-              background: `linear-gradient(135deg, ${theme.primary2}, ${theme.primary})`,
-              border: '1px solid rgba(255,255,255,0.2)',
+              background: theme.primary,
+              border: 'none',
               position: 'relative', overflow: 'hidden',
             }}>
-              <svg style={{ position: 'absolute', top: -30, right: -30, opacity: 0.18 }} width="150" height="150" viewBox="0 0 150 150">
-                <path d="M75 10L20 50v45c0 35 25 50 55 50s55-15 55-50V50L75 10z" stroke="#fff" strokeWidth="2" fill="none"/>
-              </svg>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.78)', letterSpacing: 1, fontWeight: 700 }}>BLUE SHARK PASS</div>
               <div style={{ fontSize: 22, color: '#fff', fontWeight: 800, marginTop: 6 }}>无限次月卡</div>
               <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.85)', marginTop: 8 }}>
@@ -229,7 +232,7 @@ function CouponsScreen({ theme, nav }) {
                   <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 4 }}>{p.s}</div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <div className="mono" style={{ fontSize: 22, fontWeight: 800, color: theme.accent }}>¥{p.p}</div>
+                  <div className="mono" style={{ fontSize: 22, fontWeight: 800, color: theme.text }}>¥{p.p}</div>
                 </div>
               </Card>
             ))}
@@ -240,7 +243,7 @@ function CouponsScreen({ theme, nav }) {
           <div style={{ padding: '0 16px 24px', textAlign: 'center', color: theme.textMuted, fontSize: 13, paddingTop: 40 }}>
             <div style={{
               width: 64, height: 64, borderRadius: 999, margin: '0 auto 12px',
-              background: '#F4F7FC', border: `1px solid ${theme.line}`,
+              background: theme.bg0, border: `1px solid ${theme.line}`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
               <Icon name="coupon" size={28} color={theme.textDim}/>
@@ -249,14 +252,15 @@ function CouponsScreen({ theme, nav }) {
           </div>
         )}
       </ScreenBody>
+      <TabBar active="savings" onTab={nav} theme={theme}/>
     </>
   );
 }
 
 const COUPONS = [
-  { id: 'c1', value: '5.0', cond: '满 10 元可用', t: '电量档专属券', exp: '2026-05-31', tag: '推荐', primary: true },
-  { id: 'c2', value: '1.0', cond: '无门槛',       t: '新人立减券',   exp: '2026-05-25', tag: null,    primary: false },
-  { id: 'c3', value: '20%', cond: '套餐档可用', t: '套餐 8 折券',  exp: '2026-06-10', tag: null,    primary: false, percent: true },
+  { id: 'c1', value: '5.0', cond: '满 10 元可用', t: '充电优惠券', exp: '2026-05-31', tag: '推荐', primary: true },
+  { id: 'c2', value: '1.0', cond: '无门槛',       t: '新人立减券', exp: '2026-05-25', tag: null,    primary: false },
+  { id: 'c3', value: '2.0', cond: '满 5 元可用',  t: '会员专享券', exp: '2026-06-10', tag: null,    primary: false },
 ];
 
 function CouponTicket({ c, theme }) {
@@ -265,15 +269,14 @@ function CouponTicket({ c, theme }) {
       position: 'relative', display: 'flex',
       borderRadius: 16, overflow: 'hidden',
       background: theme.surface, border: `1px solid ${theme.line}`,
-      boxShadow: c.primary ? `0 14px 30px -16px ${theme.glow}, 0 2px 6px rgba(15,27,54,0.04)` : '0 2px 6px rgba(15,27,54,0.04)',
     }}>
       {/* left value */}
       <div style={{
         width: 116, padding: '18px 0',
         background: c.primary
-          ? `linear-gradient(135deg, ${theme.primary2}, ${theme.primary})`
-          : `linear-gradient(135deg, ${theme.surfaceTint}, #fff)`,
-        color: c.primary ? '#fff' : theme.primaryDark,
+          ? theme.primary
+          : theme.surfaceTint,
+        color: c.primary ? '#fff' : theme.text,
         position: 'relative',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2,
         borderRight: c.primary ? 'none' : `1px dashed ${theme.line}`,
@@ -318,13 +321,13 @@ function CouponTicket({ c, theme }) {
 function MessagesScreen({ theme, nav }) {
   return (
     <>
-      <WeChatH5Header title="消息通知" theme={theme} onBack={() => nav('profile')}/>
+      <NativeTitleBar title="消息通知" theme={theme} onBack={() => nav('profile')}/>
       <ScreenBody theme={theme}>
         <div style={{ padding: '12px 16px 24px', display: 'flex', flexDirection: 'column', gap: 10 }}>
           {[
             { type: 'charge', icon: 'bolt', tint: theme.success, t: '充电完成', sub: '订单 CG…1842 已自动断电，本次消费 ¥3.50', when: '今天 18:20', unread: true },
             { type: 'warn',   icon: 'warn',  tint: theme.warning, t: '余额不足提醒', sub: '当前余额 ¥3.20 即将无法启动充电，建议充值', when: '今天 09:15', unread: true },
-            { type: 'coupon', icon: 'coupon',tint: theme.primary2,t: '新券到账', sub: '获得 1 张「电量档 ¥5 抵扣券」，5 月 31 日到期', when: '昨天 10:30', unread: false },
+            { type: 'coupon', icon: 'coupon',tint: theme.primary2,t: '新券到账', sub: '获得 1 张「充电 ¥5 抵扣券」，5 月 31 日到期', when: '昨天 10:30', unread: false },
             { type: 'sys',    icon: 'info',  tint: theme.accent,  t: '系统通告', sub: '本周六 02:00–04:00 部分站点维护，期间不可用', when: '5月12日',   unread: false },
             { type: 'fault',  icon: 'wrench',tint: theme.danger,  t: '报修已受理', sub: '工单 #4128 已分派至维护组，预计 24h 内处理', when: '5月10日',   unread: false },
           ].map((m, i) => (
@@ -363,107 +366,129 @@ function MessagesScreen({ theme, nav }) {
 function ProfileScreen({ theme, nav }) {
   return (
     <>
+      <NativeTitleBar
+        title="我的" theme={theme}
+      />
+
       <ScreenBody theme={theme}>
-        {/* hero */}
+        {/* ── hero: avatar + name ── */}
         <div style={{
-          padding: '60px 18px 24px',
-          background: `linear-gradient(135deg, ${theme.primary2}, ${theme.primary})`,
-          position: 'relative',
+          background: theme.bg0,
+          borderBottom: `1px solid ${theme.line}`,
+          padding: '16px 16px 18px',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            {/* avatar */}
             <div style={{
-              width: 64, height: 64, borderRadius: 999,
-              background: 'rgba(255,255,255,0.22)',
-              border: '2px solid rgba(255,255,255,0.35)',
+              width: 58, height: 58, borderRadius: 999, flexShrink: 0,
+              background: theme.primary,
+              border: `2px solid ${theme.surface}`,
+              boxShadow: `0 0 0 1.5px ${theme.line}`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              <span style={{ fontSize: 24, fontWeight: 700, color: '#fff' }}>陈</span>
+              <span style={{ fontSize: 22, fontWeight: 700, color: '#fff' }}>陈</span>
             </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>陈一蓝</div>
-              <div className="mono" style={{ fontSize: 11, color: 'rgba(255,255,255,0.78)', marginTop: 4 }}>UID 2086 4192</div>
-              <div style={{ marginTop: 6, display: 'flex', gap: 6 }}>
-                <span style={{
-                  display: 'inline-flex', alignItems: 'center',
-                  padding: '3px 10px', borderRadius: 999,
-                  fontSize: 11, fontWeight: 600,
-                  background: 'rgba(255,255,255,0.22)',
-                  border: '1px solid rgba(255,255,255,0.32)',
-                  color: '#fff',
-                }}>月卡用户</span>
-                <span style={{
-                  display: 'inline-flex', alignItems: 'center',
-                  padding: '3px 10px', borderRadius: 999,
-                  fontSize: 11,
-                  background: 'rgba(255,255,255,0.18)',
-                  border: '1px solid rgba(255,255,255,0.28)',
-                  color: 'rgba(255,255,255,0.92)',
-                }}>认证车辆 ×1</span>
+            {/* name + uid */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 18, fontWeight: 800, color: theme.text, letterSpacing: -0.2 }}>陈一蓝</div>
+              <div className="mono" style={{ fontSize: 11, color: theme.textDim, marginTop: 3 }}>UID 2086 4192</div>
+              <div style={{ marginTop: 7, display: 'flex', gap: 6 }}>
+                <span className="chip" style={{ background: `${theme.primary}15`, color: theme.primary, borderColor: `${theme.primary}30`, fontWeight: 600 }}>月卡用户</span>
+                <span className="chip">认证车辆 ×1</span>
               </div>
             </div>
-            <Icon name="gear" size={20} color="rgba(255,255,255,0.85)"/>
           </div>
 
-          {/* mini stats (on colored hero → white text) */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginTop: 18 }}>
-            <HeroStat label="累计充电" value="148" unit="次"/>
-            <HeroStat label="累计电量" value="1.2k" unit="度"/>
-            <HeroStat label="累计节省" value="¥86"/>
+          {/* stats row */}
+          <div style={{
+            marginTop: 16,
+            display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
+            background: theme.surface,
+            border: `1px solid ${theme.line}`,
+            borderRadius: 10, overflow: 'hidden',
+          }}>
+            {[
+              { label: '累计充电', value: '148', unit: '次' },
+              { label: '累计电量', value: '312', unit: '度' },
+              { label: '累计节省', value: '¥86', unit: null },
+            ].map((s, i) => (
+              <div key={i} style={{
+                padding: '10px 0 11px',
+                display: 'flex', flexDirection: 'column', alignItems: 'center',
+                borderRight: i < 2 ? `1px solid ${theme.line}` : 'none',
+              }}>
+                <span style={{ fontSize: 10, color: theme.textDim, marginBottom: 3 }}>{s.label}</span>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 2 }}>
+                  <span className="mono" style={{ fontSize: 20, fontWeight: 800, color: theme.text, lineHeight: 1 }}>{s.value}</span>
+                  {s.unit && <span style={{ fontSize: 10, color: theme.textMuted }}>{s.unit}</span>}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* shortcut row */}
+        {/* ── shortcut row ── */}
         <div style={{ padding: '14px 16px 0' }}>
-          <Card theme={theme}>
+          <Card theme={theme} padded={false}>
             <div style={{ display: 'flex' }}>
               {[
-                { id: 'wallet', icon: 'wallet', label: '钱包', sub: '¥28.40' },
-                { id: 'coupons', icon: 'coupon', label: '券/月卡', sub: '3张' },
-                { id: 'messages', icon: 'bell', label: '消息', sub: '2新' },
-                { id: 'orders', icon: 'list', label: '订单', sub: '本月14' },
-              ].map(s => (
+                { id: 'wallet',   icon: 'wallet', label: '钱包',   sub: '¥28.40' },
+                { id: 'coupons',  icon: 'coupon', label: '券/月卡', sub: '3 张' },
+                { id: 'messages', icon: 'bell',   label: '消息',   sub: '2 新' },
+                { id: 'orders',   icon: 'list',   label: '订单',   sub: '本月 14' },
+              ].map((s, i, a) => (
                 <div key={s.id} onClick={() => nav(s.id)} style={{
-                  flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+                  flex: 1, padding: '14px 0 12px',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
                   cursor: 'pointer',
+                  borderRight: i < a.length - 1 ? `1px solid ${theme.lineSoft}` : 'none',
                 }}>
-                  <Icon name={s.icon} size={22} color={theme.primary2}/>
-                  <span style={{ fontSize: 11, color: theme.text }}>{s.label}</span>
-                  <span className="mono" style={{ fontSize: 10, color: theme.accent }}>{s.sub}</span>
+                  <div style={{
+                    width: 34, height: 34, borderRadius: 9,
+                    background: theme.surfaceTint,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <Icon name={s.icon} size={18} color={theme.primary}/>
+                  </div>
+                  <span style={{ fontSize: 11, color: theme.text, fontWeight: 500 }}>{s.label}</span>
+                  <span className="mono" style={{ fontSize: 10, color: theme.primary }}>{s.sub}</span>
                 </div>
               ))}
             </div>
           </Card>
         </div>
 
-        {/* service list */}
+        {/* ── service list ── */}
         <SectionTitle theme={theme}>服务与设置</SectionTitle>
         <div style={{ padding: '0 16px 24px' }}>
           <Card theme={theme} padded={false}>
             {[
               { id: 'fault',   icon: 'wrench',  label: '设备故障报修', sub: '上报问题，最快 2h 响应' },
               { id: 'service', icon: 'headset', label: '在线客服',     sub: '7×24 小时人工 + AI' },
-              { id: null,      icon: 'cam',     label: '我的车辆',     sub: '已绑定 1 辆' },
+              { id: null,      icon: 'cam',     label: '我的电动车',   sub: '已绑定 1 辆' },
               { id: null,      icon: 'shield',  label: '保险与权益',   sub: '充电意外险 已生效' },
               { id: null,      icon: 'coin',    label: '发票',         sub: '可开 ¥86.20' },
               { id: null,      icon: 'info',    label: '关于我们',     sub: 'v 1.4.2' },
             ].map((r, i, a) => (
               <div key={r.label} onClick={() => r.id && nav(r.id)} style={{
-                display: 'flex', alignItems: 'center', padding: '14px 16px',
-                borderBottom: i < a.length - 1 ? `1px solid ${theme.line}` : 'none',
+                display: 'flex', alignItems: 'center', gap: 12, padding: '13px 14px',
+                borderBottom: i < a.length - 1 ? `1px solid ${theme.lineSoft}` : 'none',
                 cursor: r.id ? 'pointer' : 'default',
               }}>
                 <div style={{
-                  width: 30, height: 30, borderRadius: 8,
-                  background: `${theme.primary}18`, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  marginRight: 12,
+                  width: 30, height: 30, borderRadius: 8, flexShrink: 0,
+                  background: theme.bg0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <Icon name={r.icon} size={16} color={theme.primary2}/>
+                  <Icon name={r.icon} size={15} color={theme.textMuted}/>
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 13, color: theme.text }}>{r.label}</div>
                   <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 2 }}>{r.sub}</div>
                 </div>
-                <Icon name="right" size={14} color={theme.textDim}/>
+                <svg width="6" height="10" viewBox="0 0 6 10" fill="none" style={{ opacity: 0.25, flexShrink: 0 }}>
+                  <path d="M1 1l4 4-4 4" stroke={theme.text} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </div>
             ))}
           </Card>
@@ -501,7 +526,7 @@ function FaultScreen({ theme, nav }) {
   ];
   return (
     <>
-      <WeChatH5Header title="设备报修" theme={theme} onBack={() => nav('profile')}/>
+      <NativeTitleBar title="设备报修" theme={theme} onBack={() => nav('profile')}/>
       <ScreenBody theme={theme}>
         <div style={{ padding: '14px 16px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
           {/* device selector */}
@@ -547,7 +572,7 @@ function FaultScreen({ theme, nav }) {
             {[1, 2].map(i => (
               <div key={i} style={{
                 width: 84, height: 84, borderRadius: 12,
-                background: `linear-gradient(135deg, ${theme.surfaceTint}, #FFFFFF)`,
+                background: theme.surfaceTint,
                 border: `1px solid ${theme.line}`,
                 position: 'relative', overflow: 'hidden',
               }}>
@@ -584,7 +609,7 @@ function FaultScreen({ theme, nav }) {
               <div style={{ flex: 1, display: 'flex', gap: 6 }}>
                 {['一般', '紧急', '非常紧急'].map((u, i) => (
                   <span key={u} className="chip" style={{
-                    background: i === 1 ? `${theme.warning}25` : 'rgba(255,255,255,0.04)',
+                    background: i === 1 ? `${theme.warning}25` : theme.surface,
                     color: i === 1 ? theme.warning : theme.textMuted,
                     borderColor: i === 1 ? `${theme.warning}66` : theme.line,
                   }}>{u}</span>
@@ -607,15 +632,15 @@ function FaultScreen({ theme, nav }) {
 function ServiceScreen({ theme, nav }) {
   return (
     <>
-      <WeChatH5Header title="客服中心" theme={theme} onBack={() => nav('profile')}/>
+      <NativeTitleBar title="客服中心" theme={theme} onBack={() => nav('profile')}/>
       <ScreenBody theme={theme}>
         <div style={{ padding: '14px 16px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
           {/* hero entrance */}
-          <Card theme={theme} glow style={{ background: `linear-gradient(135deg, ${theme.primary2}, ${theme.primary})`, border: '1px solid rgba(255,255,255,0.18)' }}>
+          <Card theme={theme} style={{ background: theme.primary, border: 'none' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
               <div style={{
                 width: 56, height: 56, borderRadius: 14,
-                background: '#E5EAF3', border: '1px solid rgba(255,255,255,0.25)',
+                background: 'rgba(255,255,255,0.22)', border: '1px solid rgba(255,255,255,0.25)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
                 <Icon name="message" size={28} color="#fff"/>
@@ -641,11 +666,11 @@ function ServiceScreen({ theme, nav }) {
           <Card theme={theme} padded={false}>
             {[
               '余额不足为什么不能开始充电？',
-              '充电桩扫码无反应怎么办？',
+              '充电柜扫码无反应怎么办？',
               '为什么充满后没有自动断电？',
-              '套餐档可以中途结束并退款吗？',
+              '充电途中如何停止充电？',
               '月卡用户的最低余额还生效吗？',
-              '订单计费看起来不对，怎么申诉？',
+              '用电量怎么查看和核对？',
             ].map((q, i, a) => (
               <div key={q} style={{
                 display: 'flex', alignItems: 'center', padding: '14px 16px',
@@ -653,7 +678,7 @@ function ServiceScreen({ theme, nav }) {
               }}>
                 <span style={{
                   width: 20, height: 20, borderRadius: 999,
-                  background: i < 2 ? `${theme.primary}30` : 'rgba(255,255,255,0.04)',
+                  background: i < 2 ? `${theme.primary}30` : theme.bg0,
                   color: i < 2 ? theme.accent : theme.textMuted,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 11, fontWeight: 700, marginRight: 12,
@@ -691,13 +716,410 @@ function ChannelCard({ theme, icon, t, sub, sub2 }) {
         <Icon name={icon} size={18} color={theme.primary2}/>
       </div>
       <div style={{ fontSize: 13, color: theme.text, fontWeight: 700, marginTop: 10 }}>{t}</div>
-      <div className="mono" style={{ fontSize: 12, color: theme.accent, marginTop: 4 }}>{sub}</div>
+      <div className="mono" style={{ fontSize: 12, color: theme.text, marginTop: 4 }}>{sub}</div>
       <div style={{ fontSize: 10, color: theme.textMuted, marginTop: 2 }}>{sub2}</div>
     </Card>
   );
 }
 
+// ─── SavingsScreen — 省钱中心 (tab landing) ──────────────────────
+function SavingsScreen({ theme, nav }) {
+  const [checkedIn, setCheckedIn] = React.useState(false);
+  const dayIdx = 4; // today = 周五 (0-indexed)
+
+  return (
+    <>
+      <NativeTitleBar title="省钱中心" theme={theme}/>
+
+      <ScreenBody theme={theme}>
+        {/* hero */}
+        <div style={{ padding: '12px 16px 0' }}>
+          <Card theme={theme} padded={false} style={{
+            padding: '20px 20px 16px',
+            background: theme.primary,
+            border: 'none', overflow: 'hidden', position: 'relative',
+          }}>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)' }}>本月累计节省</div>
+            <div className="mono" style={{ fontSize: 44, fontWeight: 800, color: '#fff', letterSpacing: -1.5, marginTop: 2 }}>¥12.50</div>
+            <div style={{ marginTop: 14, display: 'flex', gap: 0 }}>
+              {[
+                { label: '累计节省',  value: '¥86.40' },
+                { label: '积分',  value: '2,480 分' },
+                { label: '可兑礼品',  value: '12 件' },
+              ].map((s, i) => (
+                <React.Fragment key={s.label}>
+                  {i > 0 && <div style={{ width: 1, background: 'rgba(255,255,255,0.2)', margin: '0 14px' }}/>}
+                  <div>
+                    <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.68)' }}>{s.label}</div>
+                    <div className="mono" style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginTop: 3 }}>{s.value}</div>
+                  </div>
+                </React.Fragment>
+              ))}
+            </div>
+          </Card>
+        </div>
+
+        {/* 我的权益 */}
+        <SectionTitle theme={theme} right={
+          <span onClick={() => nav('coupons')} style={{ color: theme.accent, cursor: 'pointer' }}>全部权益 →</span>
+        }>我的权益</SectionTitle>
+        <div style={{ padding: '0 16px', display: 'flex', gap: 10 }}>
+          {[
+            {
+              icon: 'coupon', value: '3', unit: '张可用优惠券',
+              note: '1张本周到期', noteTint: theme.danger,
+              badge: '3张', badgeBg: theme.danger,
+              target: 'coupons',
+            },
+            {
+              icon: 'shield', value: '12', unit: '天月卡剩余',
+              note: '5月26日到期', noteTint: theme.textMuted,
+              badge: '生效中', badgeBg: theme.success,
+              target: 'coupons',
+            },
+          ].map(c => (
+            <div key={c.icon} onClick={() => nav(c.target)} style={{ flex: 1, cursor: 'pointer' }}>
+              <Card theme={theme} style={{
+                background: theme.surfaceTint,
+                border: `1.5px solid ${theme.primary}28`,
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <Icon name={c.icon} size={22} color={theme.primary2}/>
+                  <span style={{
+                    fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 4,
+                    background: c.badgeBg, color: '#fff',
+                  }}>{c.badge}</span>
+                </div>
+                <div className="mono" style={{ fontSize: 28, fontWeight: 800, color: theme.primary, marginTop: 10, lineHeight: 1 }}>{c.value}</div>
+                <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 4 }}>{c.unit}</div>
+                <div style={{ fontSize: 10, color: theme.textMuted, marginTop: 6 }}>{c.note}</div>
+              </Card>
+            </div>
+          ))}
+        </div>
+
+        {/* 每日签到 */}
+        <SectionTitle theme={theme}>每日签到</SectionTitle>
+        <div style={{ padding: '0 16px' }}>
+          <Card theme={theme}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+              <div>
+                <span style={{ fontSize: 13, fontWeight: 700, color: theme.text }}>连续签到 4 天</span>
+                <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 3 }}>明天再签得 50 分 · 连签 7 天得大奖</div>
+              </div>
+              <Button
+                kind={checkedIn ? 'ghost' : 'primary'} theme={theme}
+                style={{ height: 34, padding: '0 14px', fontSize: 12 }}
+                disabled={checkedIn}
+                onClick={() => setCheckedIn(true)}
+              >{checkedIn ? '✓ 已签' : '签到 +30分'}</Button>
+            </div>
+            <div style={{ display: 'flex', gap: 6 }}>
+              {['一', '二', '三', '四', '五', '六', '日'].map((d, i) => {
+                const done = i < dayIdx || (i === dayIdx && checkedIn);
+                const today = i === dayIdx;
+                return (
+                  <div key={d} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
+                    <div style={{
+                      width: '100%', aspectRatio: '1/1', borderRadius: 8,
+                      background: done ? theme.primary : today ? `${theme.primary}20` : theme.bg0,
+                      border: today && !done ? `1.5px solid ${theme.primary}` : '1.5px solid transparent',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      {done
+                        ? <Icon name="check" size={11} color="#fff"/>
+                        : <Icon name="coin" size={11} color={today ? theme.primary : theme.textDim}/>
+                      }
+                    </div>
+                    <span style={{
+                      fontSize: 9,
+                      color: done ? theme.primary : today ? theme.primary : theme.textDim,
+                      fontWeight: today ? 700 : 400,
+                    }}>周{d}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', fontSize: 11, color: theme.textMuted, borderTop: `1px solid ${theme.line}`, paddingTop: 10 }}>
+              <span>本周累计 <span className="mono" style={{ color: theme.accent }}>+120 分</span></span>
+              <span onClick={() => nav('shop')} style={{ color: theme.accent, cursor: 'pointer' }}>积分兑好礼 →</span>
+            </div>
+          </Card>
+        </div>
+
+        {/* 限时活动 */}
+        <SectionTitle theme={theme}>限时活动</SectionTitle>
+        <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {[
+            {
+              tag: '充值返利', title: '充 50 送 5 元赠送金额',
+              sub: '本月累计充值 ¥50 即可获赠', timeLeft: '剩余 3 天',
+              grad: theme.primary,
+              id: 'wallet', action: '去充值',
+            },
+            {
+              tag: '新站开业', title: '蓝桥科技园新站优惠',
+              sub: '开业期间充电享 8 折服务费', timeLeft: '剩余 6 天',
+              grad: '#10B981',
+              id: 'map', action: '查看站点',
+            },
+          ].map((a, i) => (
+            <div key={i} style={{
+              borderRadius: 16, padding: '16px 18px',
+              background: a.grad, position: 'relative', overflow: 'hidden',
+            }}>
+              <div style={{ position: 'relative' }}>
+                <span style={{
+                  fontSize: 10, fontWeight: 700, letterSpacing: 0.6,
+                  color: 'rgba(255,255,255,0.9)',
+                  background: 'rgba(255,255,255,0.22)', borderRadius: 4, padding: '2px 7px',
+                }}>{a.tag}</span>
+                <div style={{ fontSize: 17, fontWeight: 800, color: '#fff', marginTop: 8 }}>{a.title}</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
+                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.78)' }}>{a.sub} · {a.timeLeft}</span>
+                  <span onClick={() => nav(a.id)} style={{
+                    fontSize: 12, fontWeight: 600, color: '#fff',
+                    background: 'rgba(255,255,255,0.22)', borderRadius: 999,
+                    padding: '6px 14px', border: '1px solid rgba(255,255,255,0.3)', cursor: 'pointer',
+                  }}>{a.action} →</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* 推荐有奖 */}
+        <SectionTitle theme={theme}>推荐有奖</SectionTitle>
+        <div style={{ padding: '0 16px 28px' }}>
+          <Card theme={theme} padded={false} style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{
+              width: 46, height: 46, borderRadius: 12, flexShrink: 0,
+              background: `${theme.primary}22`, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Icon name="headset" size={22} color={theme.primary2}/>
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: theme.text }}>邀请好友注册</div>
+              <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 4 }}>
+                好友首充即送双方各 <span className="mono" style={{ color: theme.accent }}>¥5.00</span> 券
+              </div>
+            </div>
+            <Button kind="primary" theme={theme} style={{ height: 34, padding: '0 14px', fontSize: 12, flexShrink: 0 }}>
+              去邀请
+            </Button>
+          </Card>
+        </div>
+      </ScreenBody>
+      <TabBar active="savings" onTab={nav} theme={theme}/>
+    </>
+  );
+}
+
+// ─── ShopScreen — 积分商城 (tab landing) ─────────────────────────
+const SHOP_ITEMS = [
+  { id: 'p1', name: '防水充电口保护套', cat: '充电配件', price: '9.9',  pts: 500,   tag: '热销', sales: '2.3k', icon: 'plug',    tint: '#2E5BFF' },
+  { id: 'p2', name: '5m 延长充电线',    cat: '充电配件', price: '29.9', pts: 1500,  tag: '新品', sales: '986',  icon: 'bolt',    tint: '#0099FF' },
+  { id: 'p3', name: '智能防盗报警器',   cat: '安全装备', price: '79.9', pts: 4000,  tag: null,   sales: '445',  icon: 'bell',    tint: '#F59E0B' },
+  { id: 'p4', name: '轻量防护头盔',     cat: '安全装备', price: '199',  pts: 10000, tag: '精选', sales: '678',  icon: 'shield',  tint: '#EF4444' },
+  { id: 'p5', name: '蓝鲨保温水杯',     cat: '车辆周边', price: '39.9', pts: 2000,  tag: '特惠', sales: '1.1k', icon: 'coin',    tint: '#10B981' },
+  { id: 'p6', name: '手机防震支架',     cat: '车辆周边', price: '19.9', pts: 1000,  tag: null,   sales: '3.2k', icon: 'gear',    tint: '#5A7CFF' },
+];
+
+const FLASH_ITEMS = [
+  { id: 'f1', name: '防水保护套', sale: '4.9',  orig: '9.9',  tint: '#2E5BFF', icon: 'plug'   },
+  { id: 'f2', name: '防盗链条锁', sale: '39',   orig: '79.9', tint: '#F59E0B', icon: 'shield' },
+  { id: 'f3', name: '手机支架',   sale: '9.9',  orig: '19.9', tint: '#5A7CFF', icon: 'gear'   },
+];
+
+function ShopScreen({ theme, nav }) {
+  const [cat, setCat] = React.useState('全部');
+  const [cartN] = React.useState(2);
+  const cats = ['全部', '充电配件', '安全装备', '车辆周边', '积分兑换'];
+  const filtered = cat === '全部' || cat === '积分兑换' ? SHOP_ITEMS : SHOP_ITEMS.filter(p => p.cat === cat);
+
+  // countdown: hardcoded display value
+  const [sec, setSec] = React.useState(2058); // 34:18
+  React.useEffect(() => {
+    const t = setInterval(() => setSec(s => Math.max(0, s - 1)), 1000);
+    return () => clearInterval(t);
+  }, []);
+  const mm = String(Math.floor(sec / 60)).padStart(2, '0');
+  const ss = String(sec % 60).padStart(2, '0');
+
+  return (
+    <>
+      <NativeTitleBar
+        title="积分商城" theme={theme}
+      />
+
+      <ScreenBody theme={theme}>
+        {/* search */}
+        <div style={{ padding: '8px 16px 6px' }}>
+          <div style={{
+            height: 38, borderRadius: 999, padding: '0 14px',
+            display: 'flex', alignItems: 'center', gap: 8,
+            background: theme.surface, border: `1px solid ${theme.line}`,
+          }}>
+            <Icon name="search" size={15} color={theme.textMuted}/>
+            <span style={{ fontSize: 13, color: theme.textDim }}>搜索商品</span>
+          </div>
+        </div>
+
+        {/* points bar */}
+        <div style={{ padding: '0 16px 10px' }}>
+          <Card theme={theme} padded={false} style={{
+            padding: '12px 16px',
+            background: theme.surfaceTint,
+            border: `1px solid ${theme.primary}2A`,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          }}>
+            <div>
+              <div style={{ fontSize: 11, color: theme.textMuted }}>我的积分</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 3, marginTop: 3 }}>
+                <span className="mono" style={{ fontSize: 26, fontWeight: 800, color: theme.text }}>2,480</span>
+                <span style={{ fontSize: 11, color: theme.textMuted }}>分</span>
+              </div>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: 11, color: theme.textMuted }}>可兑换</div>
+              <div className="mono" style={{ fontSize: 15, fontWeight: 700, color: theme.text, marginTop: 2 }}>12 件商品</div>
+              <div onClick={() => nav('savings')} style={{ fontSize: 10, color: theme.primary, cursor: 'pointer', marginTop: 4 }}>
+                如何获取积分 →
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* flash sale */}
+        <div style={{ padding: '0 16px 8px' }}>
+          <div style={{
+            borderRadius: 14, padding: '12px 14px',
+            background: theme.primary,
+            display: 'flex', alignItems: 'center', gap: 10,
+          }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: '#fff' }}>限时秒杀</div>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.85)', marginTop: 2 }}>低至 5 折 · 每日 12:00 更新</div>
+            </div>
+            {/* countdown */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+              {[mm, ':', ss].map((s, i) => (
+                <span key={i} className="mono" style={{
+                  fontSize: s === ':' ? 14 : 15, fontWeight: 800, color: '#fff',
+                  background: s === ':' ? 'transparent' : 'rgba(0,0,0,0.22)',
+                  borderRadius: s === ':' ? 0 : 5,
+                  padding: s === ':' ? '0 1px' : '3px 5px',
+                }}>{s}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* flash products horizontal */}
+        <div style={{ display: 'flex', gap: 10, padding: '0 16px 14px', overflowX: 'auto' }} className="noscroll">
+          {FLASH_ITEMS.map(p => (
+            <div key={p.id} style={{
+              width: 108, flexShrink: 0, borderRadius: 12,
+              background: theme.surface, border: `1px solid ${theme.line}`,
+              overflow: 'hidden', cursor: 'pointer',
+            }}>
+              <div style={{
+                height: 76,
+                background: theme.bg0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <div style={{
+                  width: 44, height: 44, borderRadius: 12,
+                  background: theme.surface, border: `1px solid ${theme.line}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <Icon name={p.icon} size={22} color={theme.textDim}/>
+                </div>
+              </div>
+              <div style={{ padding: '8px 10px 10px' }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: theme.text, lineHeight: 1.3 }}>{p.name}</div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 3, marginTop: 5 }}>
+                  <span className="mono" style={{ fontSize: 14, fontWeight: 800, color: theme.danger }}>¥{p.sale}</span>
+                  <span className="mono" style={{ fontSize: 9, color: theme.textDim, textDecoration: 'line-through' }}>¥{p.orig}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* category tabs */}
+        <div style={{ display: 'flex', gap: 6, padding: '0 16px 10px', overflowX: 'auto' }} className="noscroll">
+          {cats.map(c => {
+            const on = cat === c;
+            return (
+              <span key={c} onClick={() => setCat(c)} className="chip" style={{
+                cursor: 'pointer', whiteSpace: 'nowrap',
+                background: on ? theme.primary : '#fff',
+                borderColor: on ? theme.primary : theme.line,
+                color: on ? '#fff' : theme.textMuted,
+                fontWeight: on ? 700 : 500,
+              }}>{c}</span>
+            );
+          })}
+        </div>
+
+        {/* product grid */}
+        <div style={{ padding: '0 16px 28px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
+          {filtered.map(p => (
+            <div key={p.id} style={{
+              borderRadius: 14, overflow: 'hidden', cursor: 'pointer',
+              background: theme.surface, border: `1px solid ${theme.line}`,
+              }}>
+              <div style={{
+                height: 100,
+                background: theme.bg0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                position: 'relative',
+              }}>
+                <div style={{
+                  width: 54, height: 54, borderRadius: 14,
+                  background: theme.surface, border: `1px solid ${theme.line}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <Icon name={p.icon} size={26} color={theme.textDim}/>
+                </div>
+                {p.tag && (
+                  <span style={{
+                    position: 'absolute', top: 8, left: 8,
+                    fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 4,
+                    background: p.tag === '热销' ? theme.danger : p.tag === '新品' ? theme.success : p.tag === '精选' ? theme.primary : theme.accent,
+                    color: '#fff',
+                  }}>{p.tag}</span>
+                )}
+              </div>
+              <div style={{ padding: '10px 12px 12px' }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: theme.text, lineHeight: 1.4 }}>{p.name}</div>
+                <div style={{ fontSize: 10, color: theme.textMuted, marginTop: 3 }}>已售 {p.sales}</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 8 }}>
+                  <div>
+                    <div className="mono" style={{ fontSize: 17, fontWeight: 800, color: theme.primary }}>¥{p.price}</div>
+                    <div style={{ fontSize: 9, color: theme.textMuted, marginTop: 1 }}>或 {p.pts.toLocaleString()} 积分</div>
+                  </div>
+                  <div style={{
+                    width: 28, height: 28, borderRadius: 6,
+                    background: theme.primary,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <Icon name="plus" size={14} color="#fff"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </ScreenBody>
+      <TabBar active="shop" onTab={nav} theme={theme}/>
+    </>
+  );
+}
+
 Object.assign(window, {
   WalletScreen, CouponsScreen, MessagesScreen, ProfileScreen, FaultScreen, ServiceScreen,
+  SavingsScreen, ShopScreen,
   HeroStat,
 });

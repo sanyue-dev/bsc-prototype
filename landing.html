@@ -1,0 +1,1031 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>蓝鲨充电 — 城市两轮智能充电平台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<style>
+/* ── reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── tokens (exact eco-theme values from ui.jsx) ── */
+:root {
+  --green:      #1A9E6E;
+  --green2:     #28B47E;
+  --greenDark:  #127A54;
+  --greenTint:  #E4F1EA;
+  --greenTint2: #F0FBF5;
+  --bg0:        #F0F5F2;
+  --bg1:        #F5F8F6;
+  --surface:    #FFFFFF;
+  --line:       #DCE8E1;
+  --lineSoft:   #EBF2EE;
+  --text:       #111816;
+  --muted:      #566961;
+  --dim:        #96A69D;
+  --dark:       #060F0B;
+  --darkSurf:   rgba(10,36,24,.84);
+  --darkLine:   rgba(60,160,100,.22);
+  --warning:    #B07010;
+  --danger:     #C43030;
+  --radius:     10px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: "Noto Sans SC", "PingFang SC", -apple-system, system-ui, sans-serif;
+  background: var(--surface);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  text-wrap: pretty;
+}
+
+/* ── NAV ── */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  height: 56px; display: flex; align-items: center; gap: 24px;
+  padding: 0 clamp(16px,4vw,56px);
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+  transition: box-shadow .2s;
+}
+.nav.scrolled { box-shadow: 0 2px 12px rgba(17,24,22,.06); }
+
+.nav-logo {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 16px; font-weight: 900; color: var(--text); letter-spacing: -.2px;
+  text-decoration: none; flex-shrink: 0;
+}
+.nav-logo svg { flex-shrink: 0; }
+
+.nav-links {
+  display: flex; align-items: center; gap: 24px;
+  list-style: none; margin: 0 auto;
+}
+.nav-links a {
+  font-size: 13px; color: var(--muted); text-decoration: none;
+  font-weight: 500; transition: color .12s;
+}
+.nav-links a:hover { color: var(--text); }
+
+.nav-btn {
+  padding: 7px 18px; border-radius: 7px;
+  background: var(--green); color: #fff;
+  font-size: 13px; font-weight: 700; text-decoration: none;
+  white-space: nowrap; flex-shrink: 0;
+  transition: background .15s;
+}
+.nav-btn:hover { background: var(--green2); }
+
+/* ── HERO ── */
+.hero {
+  padding-top: 56px;
+  background: var(--bg0);
+}
+.hero-inner {
+  max-width: 1160px; margin: 0 auto;
+  padding: clamp(52px,7vw,88px) clamp(20px,4vw,56px);
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 56px; align-items: center;
+}
+
+/* chip — same class as app */
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 5px;
+  font-size: 11px; font-weight: 600; letter-spacing: .5px;
+  border: 1px solid #C3E0D4;
+  background: var(--greenTint);
+  color: var(--green);
+  margin-bottom: 20px;
+}
+.chip-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green);
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+
+h1.hero-h1 {
+  font-size: clamp(36px,4vw,56px); font-weight: 900;
+  color: var(--text); line-height: 1.1; letter-spacing: -1.5px;
+  margin-bottom: 16px;
+}
+h1.hero-h1 .hl { color: var(--green); }
+
+.hero-lead {
+  font-size: 15px; line-height: 1.8; color: var(--muted);
+  margin-bottom: 32px; max-width: 420px;
+}
+
+.hero-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 12px 24px; border-radius: var(--radius);
+  background: var(--green); color: #fff;
+  font-size: 14px; font-weight: 700; text-decoration: none;
+  border: none; cursor: pointer; white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(26,158,110,.28);
+  transition: all .16s;
+}
+.btn-primary:hover { background: var(--green2); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(26,158,110,.34); }
+
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 11px 24px; border-radius: var(--radius);
+  background: var(--surface); color: var(--text);
+  font-size: 14px; font-weight: 600; text-decoration: none;
+  border: 1px solid var(--line); cursor: pointer; white-space: nowrap;
+  transition: all .16s;
+}
+.btn-ghost:hover { border-color: var(--green); color: var(--green); }
+
+/* device diagram SVG wrapper */
+.hero-device {
+  display: flex; justify-content: center; align-items: center;
+  position: relative;
+}
+
+/* ── STATS STRIP ── */
+.stats {
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.stats-inner {
+  max-width: 1160px; margin: 0 auto;
+  padding: 0 clamp(20px,4vw,56px);
+  display: grid; grid-template-columns: repeat(4,1fr);
+}
+.stat {
+  padding: 32px 0; text-align: center;
+  border-right: 1px solid var(--line);
+}
+.stat:last-child { border-right: none; }
+.stat-n {
+  font-size: 40px; font-weight: 900; color: var(--green);
+  letter-spacing: -1.5px; line-height: 1; margin-bottom: 5px;
+  font-variant-numeric: tabular-nums;
+}
+.stat-n sup { font-size: 18px; font-weight: 700; letter-spacing: 0; }
+.stat-l { font-size: 13px; color: var(--muted); font-weight: 500; }
+
+/* ── SHARED SECTION SHELL ── */
+.sec { padding: 88px clamp(20px,4vw,56px); }
+.sec-inner { max-width: 1160px; margin: 0 auto; }
+
+.sec-tag {
+  font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  color: var(--green); text-transform: uppercase; margin-bottom: 8px;
+}
+.sec-h2 {
+  font-size: clamp(24px,2.6vw,34px); font-weight: 900;
+  color: var(--text); letter-spacing: -.4px; margin-bottom: 10px;
+}
+.sec-lead {
+  font-size: 15px; color: var(--muted); line-height: 1.75;
+  max-width: 500px; margin-bottom: 48px;
+}
+
+/* ── HOW IT WORKS ── */
+.how-bg { background: var(--surface); }
+
+.steps {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  position: relative;
+}
+.steps::before {
+  content: '';
+  position: absolute; top: 26px;
+  left: calc(12.5% + 4px); right: calc(12.5% + 4px);
+  height: 1px;
+  background: repeating-linear-gradient(90deg,
+    var(--line) 0, var(--line) 8px, transparent 8px, transparent 18px);
+}
+
+.step {
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; padding: 0 20px;
+}
+.step-ring {
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--greenTint);
+  border: 2px solid var(--green);
+  display: flex; align-items: center; justify-content: center;
+  position: relative; z-index: 1; margin-bottom: 18px; flex-shrink: 0;
+}
+.step-h { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.step-p { font-size: 13px; color: var(--muted); line-height: 1.65; }
+
+/* ── FEATURES ── */
+.feat-bg { background: var(--bg0); }
+
+.feat-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 14px;
+}
+.feat-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  transition: box-shadow .2s, transform .2s;
+}
+.feat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(17,24,22,.07);
+}
+.feat-ico {
+  width: 42px; height: 42px; border-radius: 9px;
+  background: var(--greenTint); border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 14px;
+}
+.feat-h { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.feat-p { font-size: 13px; color: var(--muted); line-height: 1.65; }
+
+/* ── CHARGING PREVIEW (dark immersive) ── */
+.charge-sec {
+  background: var(--dark);
+  padding: 88px clamp(20px,4vw,56px);
+  position: relative; overflow: hidden;
+}
+.charge-sec::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(var(--darkLine) 1px, transparent 1px),
+    linear-gradient(90deg, var(--darkLine) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: .6;
+}
+.charge-inner {
+  max-width: 1160px; margin: 0 auto; position: relative; z-index: 1;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 72px; align-items: center;
+}
+
+.charge-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 5px 12px; border-radius: 5px;
+  background: rgba(26,158,110,.15); border: 1px solid rgba(26,158,110,.35);
+  color: var(--green2); font-size: 11px; font-weight: 700; letter-spacing: .5px;
+  margin-bottom: 18px;
+}
+.charge-badge-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green2); animation: blink 2s ease-in-out infinite;
+}
+.charge-h2 {
+  font-size: clamp(26px,2.8vw,38px); font-weight: 900;
+  color: #fff; letter-spacing: -.5px; line-height: 1.2; margin-bottom: 14px;
+}
+.charge-lead { font-size: 15px; color: rgba(255,255,255,.5); line-height: 1.75; margin-bottom: 28px; }
+
+.charge-stats {
+  display: flex; flex-direction: column; gap: 12px;
+}
+.charge-stat-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; border-radius: var(--radius);
+  background: var(--darkSurf);
+  border: 1px solid var(--darkLine);
+}
+.charge-stat-icon {
+  width: 32px; height: 32px; border-radius: 7px;
+  background: rgba(26,158,110,.15); border: 1px solid rgba(26,158,110,.3);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.charge-stat-label { font-size: 12px; color: rgba(255,255,255,.45); margin-bottom: 2px; }
+.charge-stat-val { font-size: 16px; font-weight: 700; color: #fff; }
+
+/* charging dial (right side) */
+.charge-dial-wrap {
+  display: flex; justify-content: center; align-items: center;
+  position: relative;
+}
+
+/* ── OPERATOR ── */
+.op-bg { background: var(--bg1); }
+
+.op-inner {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 72px; align-items: start;
+}
+
+.op-badge {
+  display: inline-block; padding: 4px 10px; border-radius: 5px;
+  background: var(--greenTint); border: 1px solid #C3E0D4;
+  color: var(--green); font-size: 11px; font-weight: 700; letter-spacing: .5px;
+  margin-bottom: 18px;
+}
+.op-h2 { font-size: clamp(24px,2.6vw,34px); font-weight: 900; color: var(--text); letter-spacing: -.4px; margin-bottom: 12px; }
+.op-lead { font-size: 15px; color: var(--muted); line-height: 1.75; margin-bottom: 24px; }
+
+.perks { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+.perk { display: flex; align-items: flex-start; gap: 10px; }
+.perk-ico {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--greenTint); border: 1.5px solid var(--green);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+}
+.perk-body { font-size: 14px; color: var(--muted); line-height: 1.55; }
+.perk-body strong { color: var(--text); font-weight: 700; }
+
+/* earnings card — matches app Card style */
+.earn-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.earn-title {
+  font-size: 12px; color: var(--dim); font-weight: 600;
+  letter-spacing: .5px; margin-bottom: 14px;
+}
+.earn-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 11px 0; border-bottom: 1px solid var(--lineSoft);
+  font-size: 13px;
+}
+.earn-row:last-child { border-bottom: none; padding-bottom: 0; }
+.earn-row:first-of-type { padding-top: 0; }
+.earn-k { color: var(--muted); }
+.earn-v { color: var(--text); font-weight: 600; }
+.earn-total-row {
+  margin-top: 10px; padding-top: 16px;
+  border-top: 1px solid var(--line);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.earn-total-label { font-size: 14px; color: var(--muted); }
+.earn-total-val { font-size: 24px; font-weight: 900; color: var(--green); letter-spacing: -1px; }
+.earn-note { font-size: 11px; color: var(--dim); margin-top: 10px; line-height: 1.5; }
+
+/* ── QR CTA ── */
+.qr-sec {
+  background: var(--green);
+  padding: 72px clamp(20px,4vw,56px);
+  text-align: center;
+}
+.qr-h2 {
+  font-size: clamp(22px,2.4vw,30px); font-weight: 900; color: #fff;
+  letter-spacing: -.3px; margin-bottom: 6px;
+}
+.qr-sub { font-size: 15px; color: rgba(255,255,255,.65); margin-bottom: 32px; }
+.qr-frame {
+  display: inline-flex; flex-direction: column; align-items: center;
+  gap: 10px;
+}
+.qr-box {
+  width: 128px; height: 128px; border-radius: 12px;
+  background: #fff; border: 2px solid rgba(255,255,255,.4);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 24px rgba(0,0,0,.14);
+}
+.qr-label { font-size: 13px; color: rgba(255,255,255,.8); font-weight: 600; }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--dark);
+  padding: 36px clamp(20px,4vw,56px);
+  color: rgba(255,255,255,.35);
+}
+.foot-inner {
+  max-width: 1160px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 14px;
+}
+.foot-brand { font-size: 14px; font-weight: 900; color: rgba(255,255,255,.6); }
+.foot-links { display: flex; gap: 18px; list-style: none; flex-wrap: wrap; }
+.foot-links a { color: rgba(255,255,255,.35); text-decoration: none; font-size: 12px; }
+.foot-links a:hover { color: rgba(255,255,255,.65); }
+.foot-copy { font-size: 12px; }
+
+/* ── REVEAL ── */
+.rv  { opacity: 0; transform: translateY(22px); transition: opacity .6s ease, transform .6s ease; }
+.rv.on  { opacity: 1; transform: none; }
+.sg > * { opacity: 0; transform: translateY(18px); transition: opacity .52s ease, transform .52s ease; }
+.sg > *.on { opacity: 1; transform: none; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 960px) {
+  .nav-links { display: none; }
+  .hero-inner { grid-template-columns: 1fr; gap: 36px; }
+  .hero-device { order: -1; }
+  .stats-inner { grid-template-columns: repeat(2,1fr); }
+  .stat { border-right: none; border-bottom: 1px solid var(--line); padding: 20px 0; }
+  .steps { grid-template-columns: repeat(2,1fr); gap: 28px; }
+  .steps::before { display: none; }
+  .feat-grid { grid-template-columns: repeat(2,1fr); }
+  .charge-inner { grid-template-columns: 1fr; gap: 40px; }
+  .op-inner { grid-template-columns: 1fr; gap: 36px; }
+}
+@media (max-width: 560px) {
+  h1.hero-h1 { font-size: 32px; }
+  .stats-inner { grid-template-columns: 1fr 1fr; }
+  .feat-grid { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr 1fr; }
+  .foot-inner { flex-direction: column; text-align: center; }
+  .foot-links { justify-content: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ════════════════════════════════════════════════════════ -->
+<nav class="nav" id="topnav">
+  <a href="#" class="nav-logo">
+    <!-- shark fin icon -->
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+      <path d="M2 18 C3 13 7 8 11 5.5 C15 3 18.5 3 19.5 4 L19.5 18 Z" fill="#1A9E6E"/>
+      <path d="M10 7.5 L7.5 13 H11 L9 18 L15.5 11 H12 L13.5 7.5 Z" fill="#28B47E" opacity=".9"/>
+    </svg>
+    蓝鲨充电
+  </a>
+  <ul class="nav-links">
+    <li><a href="#how">充电流程</a></li>
+    <li><a href="#features">平台特色</a></li>
+    <li><a href="#charging">充电体验</a></li>
+    <li><a href="#operator">加盟合作</a></li>
+  </ul>
+  <a href="#operator" class="nav-btn">免费加盟 →</a>
+</nav>
+
+
+<!-- ═══ HERO ═══════════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-inner">
+
+    <!-- copy -->
+    <div>
+      <div class="chip">
+        <span class="chip-dot"></span>
+        两轮电动车 · 智能充电平台
+      </div>
+      <h1 class="hero-h1">扫码一下<br/><span class="hl">随处充电</span></h1>
+      <p class="hero-lead">
+        蓝鲨智能充电柜部署于小区楼下、菜场、商场停车场。
+        微信扫码启用插座，按需计费，充满自停，无需下载 APP。
+      </p>
+      <div class="hero-btns">
+        <a href="#how" class="btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="3" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="2"/>
+            <rect x="13" y="3" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="2"/>
+            <rect x="3" y="13" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="2"/>
+            <path d="M13 13h3v3M19 13v3M13 19h3M19 19v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          如何充电
+        </a>
+        <a href="#operator" class="btn-ghost">加盟合作 →</a>
+      </div>
+    </div>
+
+    <!-- device diagram -->
+    <div class="hero-device">
+      <svg width="320" height="400" viewBox="0 0 320 400" fill="none">
+        <defs>
+          <filter id="cardshadow" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="rgba(17,24,22,.1)"/>
+          </filter>
+        </defs>
+
+        <!-- cabinet: white card with subtle shadow -->
+        <rect x="30" y="16" width="260" height="350" rx="14"
+          fill="#FFFFFF" stroke="#DCE8E1" stroke-width="1.5"
+          filter="url(#cardshadow)"/>
+
+        <!-- top display panel -->
+        <rect x="46" y="32" width="228" height="52" rx="9"
+          fill="#F0F5F2" stroke="#DCE8E1" stroke-width="1"/>
+        <!-- status LEDs -->
+        <circle cx="64" cy="58" r="5" fill="#1A9E6E"/>
+        <circle cx="78" cy="58" r="5" fill="#1A9E6E" opacity=".35"/>
+        <circle cx="92" cy="58" r="5" fill="#DCE8E1"/>
+        <!-- brand label bars -->
+        <rect x="108" y="50" width="74" height="8" rx="2.5" fill="#DCE8E1"/>
+        <rect x="116" y="62" width="58" height="7" rx="2" fill="#C3E0D4"/>
+
+        <!-- section divider -->
+        <line x1="46" y1="94" x2="274" y2="94" stroke="#EBF2EE" stroke-width="1"/>
+
+        <!-- ─ PORT HELPER: green = active, gray = idle ─ -->
+
+        <!-- Port 1 · ACTIVE -->
+        <rect x="46" y="102" width="104" height="60" rx="8"
+          fill="#F0FBF5" stroke="#1A9E6E" stroke-width="1.3"/>
+        <circle cx="98" cy="120" r="10" fill="#E4F1EA" stroke="#1A9E6E" stroke-width="1.3"/>
+        <path d="M94 120h8M98 116v8" stroke="#1A9E6E" stroke-width="1.8" stroke-linecap="round"/>
+        <rect x="58" y="136" width="80" height="18" rx="4" fill="#E4F1EA"/>
+        <text x="98" y="149" text-anchor="middle" font-size="11" fill="#1A9E6E" font-weight="700" font-family="system-ui">充电中</text>
+        <circle cx="143" cy="106" r="4" fill="#1A9E6E"/>
+
+        <!-- Port 2 · ACTIVE -->
+        <rect x="170" y="102" width="104" height="60" rx="8"
+          fill="#F0FBF5" stroke="#1A9E6E" stroke-width="1.3"/>
+        <circle cx="222" cy="120" r="10" fill="#E4F1EA" stroke="#1A9E6E" stroke-width="1.3"/>
+        <path d="M218 120h8M222 116v8" stroke="#1A9E6E" stroke-width="1.8" stroke-linecap="round"/>
+        <rect x="182" y="136" width="80" height="18" rx="4" fill="#E4F1EA"/>
+        <text x="222" y="149" text-anchor="middle" font-size="11" fill="#1A9E6E" font-weight="700" font-family="system-ui">充电中</text>
+        <circle cx="267" cy="106" r="4" fill="#1A9E6E"/>
+
+        <!-- Port 3 · IDLE -->
+        <rect x="46" y="172" width="104" height="60" rx="8"
+          fill="#F5F8F6" stroke="#DCE8E1" stroke-width="1.3"/>
+        <circle cx="98" cy="190" r="10" fill="#EBF2EE" stroke="#C8D8D0" stroke-width="1.3"/>
+        <path d="M94 190h8M98 186v8" stroke="#96A69D" stroke-width="1.8" stroke-linecap="round"/>
+        <rect x="58" y="206" width="80" height="18" rx="4" fill="#EBF2EE"/>
+        <text x="98" y="219" text-anchor="middle" font-size="11" fill="#96A69D" font-weight="600" font-family="system-ui">空闲</text>
+        <circle cx="143" cy="176" r="4" fill="#C8D8D0"/>
+
+        <!-- Port 4 · ACTIVE -->
+        <rect x="170" y="172" width="104" height="60" rx="8"
+          fill="#F0FBF5" stroke="#1A9E6E" stroke-width="1.3"/>
+        <circle cx="222" cy="190" r="10" fill="#E4F1EA" stroke="#1A9E6E" stroke-width="1.3"/>
+        <path d="M218 190h8M222 186v8" stroke="#1A9E6E" stroke-width="1.8" stroke-linecap="round"/>
+        <rect x="182" y="206" width="80" height="18" rx="4" fill="#E4F1EA"/>
+        <text x="222" y="219" text-anchor="middle" font-size="11" fill="#1A9E6E" font-weight="700" font-family="system-ui">充电中</text>
+        <circle cx="267" cy="176" r="4" fill="#1A9E6E"/>
+
+        <!-- Port 5 · IDLE -->
+        <rect x="46" y="242" width="104" height="60" rx="8"
+          fill="#F5F8F6" stroke="#DCE8E1" stroke-width="1.3"/>
+        <circle cx="98" cy="260" r="10" fill="#EBF2EE" stroke="#C8D8D0" stroke-width="1.3"/>
+        <path d="M94 260h8M98 256v8" stroke="#96A69D" stroke-width="1.8" stroke-linecap="round"/>
+        <rect x="58" y="276" width="80" height="18" rx="4" fill="#EBF2EE"/>
+        <text x="98" y="289" text-anchor="middle" font-size="11" fill="#96A69D" font-weight="600" font-family="system-ui">空闲</text>
+        <circle cx="143" cy="246" r="4" fill="#C8D8D0"/>
+
+        <!-- Port 6 · IDLE -->
+        <rect x="170" y="242" width="104" height="60" rx="8"
+          fill="#F5F8F6" stroke="#DCE8E1" stroke-width="1.3"/>
+        <circle cx="222" cy="260" r="10" fill="#EBF2EE" stroke="#C8D8D0" stroke-width="1.3"/>
+        <path d="M218 260h8M222 256v8" stroke="#96A69D" stroke-width="1.8" stroke-linecap="round"/>
+        <rect x="182" y="276" width="80" height="18" rx="4" fill="#EBF2EE"/>
+        <text x="222" y="289" text-anchor="middle" font-size="11" fill="#96A69D" font-weight="600" font-family="system-ui">空闲</text>
+        <circle cx="267" cy="246" r="4" fill="#C8D8D0"/>
+
+        <!-- bottom bar divider -->
+        <line x1="46" y1="314" x2="274" y2="314" stroke="#EBF2EE" stroke-width="1"/>
+
+        <!-- QR + label -->
+        <rect x="52" y="322" width="52" height="52" rx="6"
+          fill="#F5F8F6" stroke="#DCE8E1" stroke-width="1"/>
+        <!-- QR corner squares -->
+        <rect x="58" y="328" width="14" height="14" rx="2" fill="#C8D8D0"/>
+        <rect x="58" y="354" width="14" height="14" rx="2" fill="#C8D8D0"/>
+        <rect x="84" y="328" width="14" height="14" rx="2" fill="#C8D8D0"/>
+        <rect x="74" y="342" width="6" height="6" rx="1" fill="#C8D8D0"/>
+        <rect x="84" y="346" width="14" height="6" rx="1.5" fill="#C8D8D0"/>
+        <rect x="74" y="354" width="24" height="8" rx="1.5" fill="#C8D8D0"/>
+
+        <text x="116" y="338" font-size="10" fill="#566961" font-family="system-ui">微信扫码</text>
+        <text x="116" y="353" font-size="12" font-weight="700" fill="#1A9E6E" font-family="system-ui">即刻充电</text>
+        <text x="116" y="367" font-size="10" fill="#96A69D" font-family="system-ui">无需下载 APP</text>
+      </svg>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══ STATS ══════════════════════════════════════════════════════ -->
+<div class="stats">
+  <div class="stats-inner">
+    <div class="stat rv">
+      <div class="stat-n">68<sup>+</sup></div>
+      <div class="stat-l">覆盖城市</div>
+    </div>
+    <div class="stat rv">
+      <div class="stat-n">12,000<sup>+</sup></div>
+      <div class="stat-l">在线设备</div>
+    </div>
+    <div class="stat rv">
+      <div class="stat-n">320<sup>万+</sup></div>
+      <div class="stat-l">注册用户</div>
+    </div>
+    <div class="stat rv">
+      <div class="stat-n">98.6<sup>%</sup></div>
+      <div class="stat-l">设备在线率</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ HOW IT WORKS ═══════════════════════════════════════════════ -->
+<section class="sec how-bg" id="how">
+  <div class="sec-inner">
+    <p class="sec-tag rv">充电流程</p>
+    <h2 class="sec-h2 rv">四步，充好一次电</h2>
+    <p class="sec-lead rv">无需下载 APP，微信扫码即用，充满自动断电，全程手机掌控。</p>
+
+    <div class="steps sg">
+      <div class="step">
+        <div class="step-ring">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="3" width="8" height="8" rx="1.5" stroke="#1A9E6E" stroke-width="2"/>
+            <rect x="13" y="3" width="8" height="8" rx="1.5" stroke="#1A9E6E" stroke-width="2"/>
+            <rect x="3" y="13" width="8" height="8" rx="1.5" stroke="#1A9E6E" stroke-width="2"/>
+            <path d="M13 13h3v3M19 13v3M13 19h3M19 19v2" stroke="#1A9E6E" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="step-h">微信扫码</div>
+        <div class="step-p">对准充电柜上的二维码，打开微信扫一扫，自动跳转小程序</div>
+      </div>
+
+      <div class="step">
+        <div class="step-ring">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <rect x="6" y="2" width="12" height="18" rx="2.5" stroke="#1A9E6E" stroke-width="2"/>
+            <path d="M10 9l-2 4h4l-2 5 7-7h-4l1-5z" stroke="#1A9E6E" stroke-width="1.6" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="step-h">选择端口</div>
+        <div class="step-p">查看哪个插座空闲，在小程序内点击启用对应端口</div>
+      </div>
+
+      <div class="step">
+        <div class="step-ring">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M9 2v4M15 2v4" stroke="#1A9E6E" stroke-width="2" stroke-linecap="round"/>
+            <rect x="6" y="6" width="12" height="8" rx="2" stroke="#1A9E6E" stroke-width="2"/>
+            <path d="M12 14v5M9 19h6" stroke="#1A9E6E" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="step-h">插入充电器</div>
+        <div class="step-p">将自己的充电器插入对应编号插座，即刻开始计费</div>
+      </div>
+
+      <div class="step">
+        <div class="step-ring">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="9" stroke="#1A9E6E" stroke-width="2"/>
+            <path d="M8 12l3 3 5-6" stroke="#1A9E6E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="step-h">充满结算</div>
+        <div class="step-p">充满自动断电，微信扣费，账单实时可查</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══ FEATURES ════════════════════════════════════════════════════ -->
+<section class="sec feat-bg" id="features">
+  <div class="sec-inner">
+    <p class="sec-tag rv">平台特色</p>
+    <h2 class="sec-h2 rv">智能、安全、省心</h2>
+    <p class="sec-lead rv">从车主到运营商，蓝鲨充电平台提供全面的数字化充电体验。</p>
+
+    <div class="feat-grid sg">
+      <div class="feat-card">
+        <div class="feat-ico">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" stroke="#1A9E6E" stroke-width="1.8" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="feat-h">实时电量监控</div>
+        <div class="feat-p">精准计量每个端口用电量，实时推送充电进度，随时掌握充电状态。</div>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-ico">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2l7 3v6c0 5-3 8-7 9-4-1-7-4-7-9V5l7-3z" stroke="#1A9E6E" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M9 12l2 2 4-4" stroke="#1A9E6E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="feat-h">过充自动断电</div>
+        <div class="feat-p">充满即停，智能保护电池健康，有效延长使用寿命，杜绝安全隐患。</div>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-ico">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="9" stroke="#1A9E6E" stroke-width="1.8"/>
+            <path d="M12 7v5l3 2" stroke="#1A9E6E" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="feat-h">灵活计费方案</div>
+        <div class="feat-p">支持按时长或按电量计费，运营商可自由设置价格，适配不同场景。</div>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-ico">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M12 22s7-7 7-13a7 7 0 10-14 0c0 6 7 13 7 13z" stroke="#1A9E6E" stroke-width="1.8"/>
+            <circle cx="12" cy="9" r="2.5" stroke="#1A9E6E" stroke-width="1.8"/>
+          </svg>
+        </div>
+        <div class="feat-h">地图找站点</div>
+        <div class="feat-p">小程序内置地图，快速定位周边充电站，实时查看端口空闲情况。</div>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-ico">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="13" width="4" height="8" rx="1" stroke="#1A9E6E" stroke-width="1.8"/>
+            <rect x="10" y="8" width="4" height="13" rx="1" stroke="#1A9E6E" stroke-width="1.8"/>
+            <rect x="17" y="4" width="4" height="17" rx="1" stroke="#1A9E6E" stroke-width="1.8"/>
+          </svg>
+        </div>
+        <div class="feat-h">运营数据看板</div>
+        <div class="feat-p">运营商专属 Web 后台，收益统计、设备监控、故障工单一屏掌控。</div>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-ico">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M3 7a2 2 0 012-2h14a2 2 0 012 2v3a2 2 0 100 4v3a2 2 0 01-2 2H5a2 2 0 01-2-2v-3a2 2 0 100-4V7z" stroke="#1A9E6E" stroke-width="1.8"/>
+            <line x1="12" y1="6" x2="12" y2="18" stroke="#1A9E6E" stroke-width="1.8" stroke-dasharray="2 2"/>
+          </svg>
+        </div>
+        <div class="feat-h">优惠券 &amp; 月卡</div>
+        <div class="feat-p">支持优惠券发放与月卡订阅，提升充电频次，增强用户粘性。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══ CHARGING PREVIEW (dark immersive) ══════════════════════════ -->
+<section class="charge-sec" id="charging">
+  <div class="charge-inner">
+
+    <!-- left: copy + stat rows -->
+    <div class="rv">
+      <div class="charge-badge">
+        <span class="charge-badge-dot"></span>
+        充电中 · A-03
+      </div>
+      <h2 class="charge-h2">充满自停<br/>全程安心</h2>
+      <p class="charge-lead">
+        蓝鲨充电柜实时监控每个端口的充电状态，电量满载即刻切断，
+        手机端同步推送通知，让每一次充电都简单放心。
+      </p>
+      <div class="charge-stats">
+        <div class="charge-stat-row">
+          <div class="charge-stat-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="9" stroke="#1A9E6E" stroke-width="2"/>
+              <path d="M12 7v5l3 2" stroke="#1A9E6E" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="charge-stat-label">已充时长</div>
+            <div class="charge-stat-val">01:24</div>
+          </div>
+        </div>
+        <div class="charge-stat-row">
+          <div class="charge-stat-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" stroke="#1A9E6E" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="charge-stat-label">当前功率</div>
+            <div class="charge-stat-val">180 W</div>
+          </div>
+        </div>
+        <div class="charge-stat-row">
+          <div class="charge-stat-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="9" stroke="#1A9E6E" stroke-width="2"/>
+              <path d="M12 7v10M9.5 10.5h5M9.5 13.5h5" stroke="#1A9E6E" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="charge-stat-label">已消费</div>
+            <div class="charge-stat-val">¥ 0.84</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- right: charging dial -->
+    <div class="charge-dial-wrap rv">
+      <svg width="300" height="300" viewBox="0 0 300 300">
+        <defs>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="6" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <!-- outer ring bg -->
+        <circle cx="150" cy="150" r="118" stroke="rgba(60,160,100,.15)" stroke-width="16" fill="none"/>
+        <!-- progress arc ~68% -->
+        <circle cx="150" cy="150" r="118"
+          stroke="#1A9E6E"
+          stroke-width="16"
+          fill="none"
+          stroke-linecap="round"
+          stroke-dasharray="501 740"
+          stroke-dashoffset="185"
+          filter="url(#glow)"
+          transform="rotate(-90 150 150)"/>
+        <!-- middle ring -->
+        <circle cx="150" cy="150" r="90" stroke="rgba(60,160,100,.1)" stroke-width="1" fill="none"/>
+        <!-- inner glow circle -->
+        <circle cx="150" cy="150" r="76" fill="rgba(26,158,110,.06)"/>
+
+        <!-- center: percentage -->
+        <text x="150" y="136" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.45)" font-family="system-ui" letter-spacing="1.5">当前电量</text>
+        <text x="150" y="178" text-anchor="middle" font-size="56" font-weight="900" fill="#fff" font-family="system-ui" letter-spacing="-2">68</text>
+        <text x="150" y="198" text-anchor="middle" font-size="18" fill="rgba(255,255,255,.55)" font-family="system-ui">%</text>
+
+        <!-- bottom label -->
+        <rect x="104" y="214" width="92" height="26" rx="13" fill="rgba(26,158,110,.18)" stroke="rgba(26,158,110,.4)" stroke-width="1"/>
+        <circle cx="120" cy="227" r="4" fill="#1A9E6E"/>
+        <text x="150" y="231" text-anchor="middle" font-size="11" fill="#28B47E" font-weight="700" font-family="system-ui" letter-spacing=".5">充电中</text>
+
+        <!-- tick marks (decorative) -->
+        <circle cx="150" cy="32" r="3" fill="rgba(26,158,110,.4)"/>
+        <circle cx="268" cy="150" r="3" fill="rgba(26,158,110,.2)"/>
+        <circle cx="32" cy="150" r="3" fill="rgba(26,158,110,.2)"/>
+      </svg>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══ OPERATOR ════════════════════════════════════════════════════ -->
+<section class="sec op-bg" id="operator">
+  <div class="sec-inner">
+    <div class="op-inner">
+
+      <!-- left copy -->
+      <div class="rv">
+        <span class="op-badge">加盟合作</span>
+        <h2 class="op-h2">把充电柜放到<br/>你管理的场所</h2>
+        <p class="op-lead">
+          蓝鲨充电提供设备部署、系统接入、运营培训全套支持，
+          无需技术背景，小程序即可管理名下每一台设备。
+        </p>
+
+        <div class="perks">
+          <div class="perk">
+            <div class="perk-ico">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="#1A9E6E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="perk-body"><strong>零硬件成本</strong> — 蓝鲨免费提供设备，场地方按比例分成</div>
+          </div>
+          <div class="perk">
+            <div class="perk-ico">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="#1A9E6E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="perk-body"><strong>双端管理后台</strong> — Web + 小程序，随时查看收益与设备状态</div>
+          </div>
+          <div class="perk">
+            <div class="perk-ico">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="#1A9E6E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="perk-body"><strong>7×24 远程运维</strong> — 故障自动报警，平台统一处理，无需自行维修</div>
+          </div>
+          <div class="perk">
+            <div class="perk-ico">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="#1A9E6E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="perk-body"><strong>按月自动结算</strong> — 收益汇总透明，每月打款，流水清晰</div>
+          </div>
+        </div>
+
+        <a href="mailto:partner@lansha.cn" class="btn-primary" style="display:inline-flex;">
+          立即申请合作 →
+        </a>
+      </div>
+
+      <!-- right: earnings card (matches app Card style) -->
+      <div class="rv">
+        <div class="earn-card">
+          <div class="earn-title">某社区场景 · 月度收益预估</div>
+          <div class="earn-row">
+            <span class="earn-k">设备配置</span>
+            <span class="earn-v">2 台 × 8 端口</span>
+          </div>
+          <div class="earn-row">
+            <span class="earn-k">日均端口利用率</span>
+            <span class="earn-v">68%</span>
+          </div>
+          <div class="earn-row">
+            <span class="earn-k">单次充电时长</span>
+            <span class="earn-v">均值 4 小时</span>
+          </div>
+          <div class="earn-row">
+            <span class="earn-k">计费单价</span>
+            <span class="earn-v">¥ 0.5 / 小时</span>
+          </div>
+          <div class="earn-total-row">
+            <span class="earn-total-label">场地方月收益（30% 分成）</span>
+            <span class="earn-total-val">≈ ¥ 653</span>
+          </div>
+        </div>
+        <p class="earn-note">* 仅供参考，实际收益因场景、地区、客流量而有所差异</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══ QR CTA ══════════════════════════════════════════════════════ -->
+<section class="qr-sec" id="miniprogram">
+  <p class="sec-tag rv" style="color:rgba(255,255,255,.75);text-align:center;">立即体验</p>
+  <h2 class="qr-h2 rv">扫码打开小程序</h2>
+  <p class="qr-sub rv">微信直接使用 · 无需下载 APP</p>
+  <div class="rv" style="display:flex;justify-content:center;">
+    <div class="qr-frame">
+      <div class="qr-box">
+        <svg width="88" height="88" viewBox="0 0 88 88" fill="none">
+          <rect x="6" y="6" width="26" height="26" rx="3.5" stroke="#1A9E6E" stroke-width="2.2" fill="none"/>
+          <rect x="12" y="12" width="14" height="14" rx="2" fill="#1A9E6E"/>
+          <rect x="56" y="6" width="26" height="26" rx="3.5" stroke="#1A9E6E" stroke-width="2.2" fill="none"/>
+          <rect x="62" y="12" width="14" height="14" rx="2" fill="#1A9E6E"/>
+          <rect x="6" y="56" width="26" height="26" rx="3.5" stroke="#1A9E6E" stroke-width="2.2" fill="none"/>
+          <rect x="12" y="62" width="14" height="14" rx="2" fill="#1A9E6E"/>
+          <rect x="38" y="6" width="12" height="6" rx="1" fill="#C3E0D4"/>
+          <rect x="38" y="14" width="6" height="10" rx="1" fill="#C3E0D4"/>
+          <rect x="46" y="18" width="6" height="12" rx="1" fill="#C3E0D4"/>
+          <rect x="38" y="32" width="14" height="6" rx="1" fill="#C3E0D4"/>
+          <rect x="6" y="38" width="8" height="12" rx="1" fill="#C3E0D4"/>
+          <rect x="16" y="40" width="14" height="8" rx="1" fill="#C3E0D4"/>
+          <rect x="38" y="38" width="8" height="8" rx="1" fill="#C3E0D4"/>
+          <rect x="48" y="38" width="10" height="6" rx="1" fill="#C3E0D4"/>
+          <rect x="58" y="36" width="24" height="6" rx="1" fill="#C3E0D4"/>
+          <rect x="60" y="44" width="10" height="10" rx="1" fill="#C3E0D4"/>
+          <rect x="72" y="44" width="10" height="6" rx="1" fill="#C3E0D4"/>
+          <rect x="38" y="48" width="14" height="6" rx="1" fill="#C3E0D4"/>
+          <rect x="38" y="58" width="6" height="24" rx="1" fill="#C3E0D4"/>
+          <rect x="46" y="58" width="10" height="10" rx="1" fill="#C3E0D4"/>
+          <rect x="58" y="58" width="12" height="12" rx="1" fill="#C3E0D4"/>
+          <rect x="72" y="56" width="10" height="8" rx="1" fill="#C3E0D4"/>
+          <rect x="58" y="72" width="24" height="10" rx="1" fill="#C3E0D4"/>
+          <rect x="46" y="72" width="8" height="10" rx="1" fill="#C3E0D4"/>
+        </svg>
+      </div>
+      <div class="qr-label">蓝鲨充电 · 微信小程序</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══ FOOTER ══════════════════════════════════════════════════════ -->
+<footer>
+  <div class="foot-inner">
+    <div class="foot-brand">蓝鲨充电</div>
+    <ul class="foot-links">
+      <li><a href="#">隐私政策</a></li>
+      <li><a href="#">用户协议</a></li>
+      <li><a href="#">联系我们</a></li>
+      <li><a href="#operator">加盟合作</a></li>
+    </ul>
+    <div class="foot-copy">© 2026 蓝鲨充电科技有限公司 · 沪ICP备XXXXXXXX号</div>
+  </div>
+</footer>
+
+
+<script>
+// nav scroll effect
+const nav = document.getElementById('topnav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 16);
+}, { passive: true });
+
+// reveal on scroll
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('on'); io.unobserve(e.target); }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -32px 0px' });
+document.querySelectorAll('.rv').forEach(el => io.observe(el));
+
+// stagger children
+const sg = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      Array.from(e.target.children).forEach((c, i) => {
+        setTimeout(() => c.classList.add('on'), i * 80);
+      });
+      sg.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.08 });
+document.querySelectorAll('.sg').forEach(el => sg.observe(el));
+</script>
+
+</body>
+</html>

@@ -3,20 +3,18 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>充电桩小程序原型</title>
+<title>充电柜小程序原型</title>
 <style>
   :root {
     color-scheme: dark;
   }
   html, body {
     margin: 0; padding: 0; min-height: 100%;
-    font-family: -apple-system, "PingFang SC", "Helvetica Neue", system-ui, sans-serif;
-    background:
-      radial-gradient(900px 600px at 12% 8%, rgba(46,91,255,0.06), transparent 60%),
-      radial-gradient(700px 500px at 92% 96%, rgba(0,153,255,0.06), transparent 60%),
-      #F4F7FC;
-    color: #0F1B36;
+    font-family: "PingFang SC", -apple-system, "Helvetica Neue", "Noto Sans SC", system-ui, sans-serif;
+    background: #F7F7F7;
+    color: #1A1A1A;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
   * { box-sizing: border-box; }
   button { font: inherit; }
@@ -56,12 +54,12 @@
   .data-tick  { animation: dataTick 2.2s ease-in-out infinite; }
   /* chip */
   .chip {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 4px 10px; border-radius: 999px;
-    font-size: 11px; line-height: 1.2; letter-spacing: 0.02em;
-    border: 1px solid #E5EAF3;
-    background: #F4F7FC;
-    color: #5C6B89;
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 9px; border-radius: 4px;
+    font-size: 11px; line-height: 1.4; letter-spacing: 0.02em;
+    border: 1px solid #E0E0E0;
+    background: #F5F5F5;
+    color: #888888;
   }
 </style>
 </head>
@@ -93,7 +91,7 @@
 <!-- defaults -->
 <script>
   window.TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
-    "theme": "tech",
+    "theme": "electric",
     "role": "owner"
   }/*EDITMODE-END*/;
 </script>
