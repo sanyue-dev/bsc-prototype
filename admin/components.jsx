@@ -159,29 +159,26 @@ function AdminHeader({ title, collapsed, onToggle }) {
       borderBottom: `1px solid ${ADMIN.border}`,
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       padding: '0 20px', zIndex: 10,
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <antd.Button
-          type="text"
-          onClick={onToggle}
-          style={{ color: ADMIN.textSecondary, padding: '0 6px' }}
-          icon={collapsed ? <icons.MenuUnfoldOutlined/> : <icons.MenuFoldOutlined/>}
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <antd.Button
+            type="text"
+            onClick={onToggle}
+            style={{ color: ADMIN.textSecondary, padding: '0 6px' }}
+            icon={collapsed ? <icons.MenuUnfoldOutlined/> : <icons.MenuFoldOutlined/>}
+          />
+        <antd.Breadcrumb
+          separator={<icons.RightOutlined style={{ color: ADMIN.border, fontSize: 11 }}/>}
+          items={[
+            { title: <span style={{ color: ADMIN.textSecondary }}>蓝鲨充电</span> },
+            { title: <span style={{ color: ADMIN.textPrimary, fontWeight: 500 }}>{title}</span> },
+          ]}
         />
-        <span style={{ fontSize: 13, color: ADMIN.textSecondary }}>蓝鲨充电</span>
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <path d="M4 2l4 4-4 4" stroke={ADMIN.border} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-        <span style={{ fontSize: 13, color: ADMIN.textPrimary, fontWeight: 500 }}>{title}</span>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
         <antd.Badge dot offset={[-2, 2]}>
-          <antd.Button type="text" style={{ color: ADMIN.textSecondary }} icon={
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-              <path d="M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
-          }/>
+          <antd.Button type="text" style={{ color: ADMIN.textSecondary }} icon={<icons.BellOutlined/>}/>
         </antd.Badge>
         <div style={{ width: 1, height: 18, background: ADMIN.borderLight, margin: '0 6px' }}/>
         <antd.Dropdown menu={userMenu} trigger={['click']}>
@@ -191,9 +188,7 @@ function AdminHeader({ title, collapsed, onToggle }) {
           }}>
             <antd.Avatar size={28} style={{ background: ADMIN.primary, fontSize: 12, fontWeight: 700, lineHeight: '28px' }}>张</antd.Avatar>
             <span style={{ fontSize: 13, color: ADMIN.textPrimary }}>张运营</span>
-            <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
-              <path d="M1 1l4 4 4-4" stroke={ADMIN.textSecondary} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <icons.DownOutlined style={{ color: ADMIN.textSecondary, fontSize: 10 }}/>
           </div>
         </antd.Dropdown>
       </div>
@@ -256,9 +251,6 @@ function AdminLayout({ active, onNav, title, children }) {
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: ADMIN.bodyBg }}>
       <style>{`
         .admin-tagview .ant-tabs-content-holder { display: none !important; }
-        .admin-tagview .ant-tabs-nav { margin-bottom: 0 !important; }
-        .admin-tagview { background: #fff; border-bottom: 1px solid ${ADMIN.divider}; padding-left: 8px; }
-        .admin-tagview .ant-tabs-tab { font-size: 12px !important; }
       `}</style>
       <AdminSidebar active={active} onNav={onNav} collapsed={collapsed}/>
       <div style={{
