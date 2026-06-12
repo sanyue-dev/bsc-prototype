@@ -178,28 +178,26 @@ function SessionsScreen() {
         ))}
       </div>
 
-      <ElCard padding={0}>
-        <div style={{ padding:'14px 20px', borderBottom:`1px solid ${ADMIN.borderLight}` }}>
-          <FilterBar>
-            <antd.Segmented size="small" value={dateFilter} onChange={v => { setDateFilter(v); setPage(1) }}
-              options={[{label:'今日',value:'today'},{label:'全部',value:'all'}]}/>
-            <ElInput placeholder="设备编号（如 CAB-A01）" value={deviceFilter}
-              onChange={e => { setDeviceFilter(e.target.value); setPage(1) }} width={180}/>
-            <ElSelect value={reasonFilter} onChange={v => { setReasonFilter(v); setPage(1) }} width={120}
-              options={[
-                {value:'all',label:'全部状态'},{value:'充电中',label:'充电中'},
-                {value:'正常完成',label:'正常完成'},{value:'用户停止',label:'用户停止'},
-                {value:'超时断电',label:'超时断电'},{value:'设备异常',label:'设备异常'},
-              ]}/>
-            <antd.Button onClick={doReset}>重置</antd.Button>
-          </FilterBar>
-        </div>
+      <QueryPanel>
+        <antd.Segmented size="small" value={dateFilter} onChange={v => { setDateFilter(v); setPage(1) }}
+          options={[{label:'今日',value:'today'},{label:'全部',value:'all'}]}/>
+        <ElInput placeholder="设备编号（如 CAB-A01）" value={deviceFilter}
+          onChange={e => { setDeviceFilter(e.target.value); setPage(1) }} width={180}/>
+        <ElSelect value={reasonFilter} onChange={v => { setReasonFilter(v); setPage(1) }} width={120}
+          options={[
+            {value:'all',label:'全部状态'},{value:'充电中',label:'充电中'},
+            {value:'正常完成',label:'正常完成'},{value:'用户停止',label:'用户停止'},
+            {value:'超时断电',label:'超时断电'},{value:'设备异常',label:'设备异常'},
+          ]}/>
+        <antd.Button onClick={doReset}>重置</antd.Button>
+      </QueryPanel>
+      <TableCard>
         <DataTable data={paginated} columns={columns}/>
         <div style={{ padding:'0 20px 16px' }}>
           <Pagination total={filtered.length} page={page} pageSize={pageSize}
             onPageChange={p=>setPage(p)} onPageSizeChange={s=>{setPageSize(s);setPage(1)}}/>
         </div>
-      </ElCard>
+      </TableCard>
     </div>
   )
 }
@@ -267,29 +265,24 @@ function OrdersScreen() {
 
   return (
     <div>
-      <PageHeader>
-        <antd.Button icon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke={ADMIN.textRegular} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>}>导出</antd.Button>
-      </PageHeader>
-      <ElCard padding={0}>
-        <div style={{ padding:'14px 20px', borderBottom:`1px solid ${ADMIN.borderLight}` }}>
-          <FilterBar>
-            <antd.Segmented size="small" value={dateFilter} onChange={v => { setDateFilter(v); setPage(1) }}
-              options={[{label:'今日',value:'today'},{label:'全部',value:'all'}]}/>
-            <ElInput placeholder="订单号" value={idFilter} onChange={e => { setIdFilter(e.target.value); setPage(1) }} width={150}/>
-            <ElInput placeholder="用户昵称" value={nameFilter} onChange={e => { setNameFilter(e.target.value); setPage(1) }} width={120}/>
-            <ElInput placeholder="手机号" value={phoneFilter} onChange={e => { setPhoneFilter(e.target.value); setPage(1) }} width={120}/>
-            <ElSelect value={statusFilter} onChange={v => { setStatusFilter(v); setPage(1) }} width={120}
-              options={[{value:'all',label:'全部状态'},{value:'待结算',label:'待结算'},{value:'已完成',label:'已完成'},{value:'已退款',label:'已退款'},{value:'异常',label:'异常'}]}/>
-            <ElSelect value={stationFilter} onChange={v => { setStationFilter(v); setPage(1) }} options={stationOptions} width={150}/>
-            <antd.Button onClick={reset}>重置</antd.Button>
-          </FilterBar>
-        </div>
+      <QueryPanel>
+        <antd.Segmented size="small" value={dateFilter} onChange={v => { setDateFilter(v); setPage(1) }}
+          options={[{label:'今日',value:'today'},{label:'全部',value:'all'}]}/>
+        <ElInput placeholder="订单号" value={idFilter} onChange={e => { setIdFilter(e.target.value); setPage(1) }} width={150}/>
+        <ElInput placeholder="用户昵称" value={nameFilter} onChange={e => { setNameFilter(e.target.value); setPage(1) }} width={120}/>
+        <ElInput placeholder="手机号" value={phoneFilter} onChange={e => { setPhoneFilter(e.target.value); setPage(1) }} width={120}/>
+        <ElSelect value={statusFilter} onChange={v => { setStatusFilter(v); setPage(1) }} width={120}
+          options={[{value:'all',label:'全部状态'},{value:'待结算',label:'待结算'},{value:'已完成',label:'已完成'},{value:'已退款',label:'已退款'},{value:'异常',label:'异常'}]}/>
+        <ElSelect value={stationFilter} onChange={v => { setStationFilter(v); setPage(1) }} options={stationOptions} width={150}/>
+        <antd.Button onClick={reset}>重置</antd.Button>
+      </QueryPanel>
+      <TableCard extra={<antd.Button icon={<icons.DownloadOutlined/>}>导出</antd.Button>}>
         <DataTable data={paginated} columns={columns}/>
         <div style={{ padding:'0 20px 16px' }}>
           <Pagination total={filtered.length} page={page} pageSize={pageSize}
             onPageChange={p=>setPage(p)} onPageSizeChange={s=>{setPageSize(s);setPage(1)}}/>
         </div>
-      </ElCard>
+      </TableCard>
 
       {detailOrder && (
         <OrderDetailModal order={detailOrder} onClose={() => setDetailOrder(null)}/>

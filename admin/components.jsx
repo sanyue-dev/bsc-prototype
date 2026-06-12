@@ -5,39 +5,39 @@
 
 // ─── Color tokens ────────────────────────────────────────────────
 const ADMIN = {
-  sidebarBg:       '#001529',
-  sidebarLightBg:  '#0f2438',
-  sidebarText:     '#bfcbd9',
-  sidebarTextHover:'#ffffff',
-  sidebarActiveBg: '#409eff',
+  sidebarBg:       '#ffffff',
+  sidebarLightBg:  '#fafafa',
+  sidebarText:     'rgba(0,0,0,0.65)',
+  sidebarTextHover:'rgba(0,0,0,0.88)',
+  sidebarActiveBg: '#1677ff',
   sidebarHoverBg:  'rgba(255,255,255,0.07)',
   headerBg:        '#ffffff',
-  bodyBg:          '#f5f7f9',
+  bodyBg:          '#f5f5f5',
   cardBg:          '#ffffff',
-  border:          '#dcdfe6',
-  borderLight:     '#ebeef5',
-  divider:         '#d8dce5',
-  textPrimary:     '#303133',
-  textRegular:     '#606266',
-  textSecondary:   '#909399',
-  primary:         '#409eff',
-  primaryHover:    '#66b1ff',
-  primaryLight:    '#ecf5ff',
-  successColor:    '#67c23a',
-  successBg:       '#f0f9eb',
-  successBorder:   '#c2e7b0',
-  successDark:     '#529b2e',
-  warningColor:    '#e6a23c',
-  warningBg:       '#fdf6ec',
-  warningBorder:   '#f5dab1',
-  warningDark:     '#b88230',
-  dangerColor:     '#f56c6c',
-  dangerBg:        '#fef0f0',
-  dangerBorder:    '#fde2e2',
-  dangerDark:      '#c45656',
-  infoColor:       '#909399',
-  infoBg:          '#f4f4f5',
-  infoBorder:      '#d3d4d6',
+  border:          '#d9d9d9',
+  borderLight:     '#f0f0f0',
+  divider:         '#f0f0f0',
+  textPrimary:     'rgba(0,0,0,0.88)',
+  textRegular:     'rgba(0,0,0,0.65)',
+  textSecondary:   'rgba(0,0,0,0.45)',
+  primary:         '#1677ff',
+  primaryHover:    '#4096ff',
+  primaryLight:    '#e6f4ff',
+  successColor:    '#52c41a',
+  successBg:       '#f6ffed',
+  successBorder:   '#b7eb8f',
+  successDark:     '#389e0d',
+  warningColor:    '#faad14',
+  warningBg:       '#fffbe6',
+  warningBorder:   '#ffe58f',
+  warningDark:     '#d48806',
+  dangerColor:     '#ff4d4f',
+  dangerBg:        '#fff2f0',
+  dangerBorder:    '#ffccc7',
+  dangerDark:      '#cf1322',
+  infoColor:       'rgba(0,0,0,0.45)',
+  infoBg:          '#fafafa',
+  infoBorder:      '#d9d9d9',
   panelTeal:       '#40c9c6',
   panelBlue:       '#36a3f7',
   panelRed:        '#f4516c',
@@ -55,6 +55,29 @@ const ADMIN_NAV = [
   { id: 'pricing',   label: '计费配置' },
   { id: 'users',     label: '用户管理' },
   { id: 'coupons',   label: '优惠券管理' },
+]
+
+const ADMIN_NAV_GROUPS = [
+  { id: 'dashboard', label: '运营看板' },
+  { id: 'reports',   label: '报表中心' },
+  {
+    id: 'charging',
+    label: '充电业务',
+    icon: icons.TransactionOutlined,
+    children: ['orders', 'sessions'],
+  },
+  {
+    id: 'operations',
+    label: '运营资产',
+    icon: icons.AppstoreOutlined,
+    children: ['stations', 'devices', 'tickets'],
+  },
+  {
+    id: 'settings',
+    label: '配置与用户',
+    icon: icons.SettingOutlined,
+    children: ['pricing', 'users', 'coupons'],
+  },
 ]
 
 const ADMIN_NAV_ICONS = {
@@ -83,63 +106,70 @@ function AdminSidebar({ active, onNav, collapsed }) {
   const Sider = antd.Layout.Sider
   const Menu  = antd.Menu
 
-  const items = ADMIN_NAV.map(item => {
+  const navById = Object.fromEntries(ADMIN_NAV.map(item => [item.id, item]))
+  const openKeys = ADMIN_NAV_GROUPS
+    .filter(item => item.children && item.children.includes(active))
+    .map(item => item.id)
+
+  const toMenuItem = item => {
     const Icon = ADMIN_NAV_ICONS[item.id]
     return {
       key:   item.id,
       icon:  <Icon/>,
       label: item.label,
     }
+  }
+
+  const [manualOpenKeys, setManualOpenKeys] = React.useState(openKeys)
+
+  React.useEffect(() => {
+    setManualOpenKeys(prev => Array.from(new Set([...prev, ...openKeys])))
+  }, [active])
+
+  const items = ADMIN_NAV_GROUPS.map(item => {
+    if (!item.children) return toMenuItem(item)
+    const Icon = item.icon
+    return {
+      key: item.id,
+      icon: <Icon/>,
+      label: item.label,
+      children: item.children.map(id => toMenuItem(navById[id])),
+    }
   })
 
   return (
     <Sider
       collapsed={collapsed}
-      width={200}
-      collapsedWidth={64}
-      theme="dark"
-      style={{ position: 'fixed', height: '100vh', left: 0, top: 0, zIndex: 100, overflow: 'hidden' }}
+      theme="light"
+      style={{
+        position: 'fixed',
+        height: 'calc(100vh - 56px)',
+        left: 0,
+        top: 56,
+        zIndex: 100,
+        overflow: 'hidden',
+        background: ADMIN.sidebarBg,
+        borderRight: `1px solid ${ADMIN.borderLight}`,
+        boxShadow: '2px 0 8px rgba(0,0,0,0.03)',
+      }}
     >
-      <div style={{
-        height: 50, display: 'flex', alignItems: 'center',
-        gap: collapsed ? 0 : 10,
-        justifyContent: collapsed ? 'center' : 'flex-start',
-        padding: collapsed ? 0 : '0 16px',
-        borderBottom: '1px solid rgba(255,255,255,0.08)',
-        flexShrink: 0, transition: 'padding .2s',
-      }}>
-        <div style={{
-          width: 30, height: 30, borderRadius: 6, flexShrink: 0,
-          background: ADMIN.primary,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="white">
-            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-          </svg>
-        </div>
-        {!collapsed && (
-          <div style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', letterSpacing: 0.5 }}>蓝鲨充电</div>
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.38)', marginTop: 1 }}>运营管理平台</div>
-          </div>
-        )}
-      </div>
-
       <Menu
-        theme="dark"
+        theme="light"
         mode="inline"
         inlineCollapsed={collapsed}
         selectedKeys={[active]}
+        openKeys={collapsed ? [] : manualOpenKeys}
+        onOpenChange={setManualOpenKeys}
         items={items}
         onClick={({ key }) => onNav(key)}
-        style={{ borderRight: 0, marginTop: 4 }}
+        style={{ borderRight: 0, padding: '8px 10px', background: 'transparent' }}
       />
     </Sider>
   )
 }
 
 // ─── AdminHeader ──────────────────────────────────────────────────
-function AdminHeader({ title, collapsed, onToggle }) {
+function AdminHeader({ title, collapsed }) {
   const userMenu = {
     items: [
       { key: 'profile',  label: '个人信息' },
@@ -155,25 +185,34 @@ function AdminHeader({ title, collapsed, onToggle }) {
 
   return (
     <div style={{
-      height: 50, background: '#fff', flexShrink: 0,
+      height: 56, background: '#fff', flexShrink: 0,
       borderBottom: `1px solid ${ADMIN.border}`,
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '0 20px', zIndex: 10,
+      padding: '0 24px 0 20px',
+      position: 'fixed', left: 0, top: 0, right: 0, zIndex: 110,
+      boxShadow: '0 1px 4px rgba(0,21,41,0.06)',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <antd.Button
-            type="text"
-            onClick={onToggle}
-            style={{ color: ADMIN.textSecondary, padding: '0 6px' }}
-            icon={collapsed ? <icons.MenuUnfoldOutlined/> : <icons.MenuFoldOutlined/>}
-          />
-        <antd.Breadcrumb
-          separator={<icons.RightOutlined style={{ color: ADMIN.border, fontSize: 11 }}/>}
-          items={[
-            { title: <span style={{ color: ADMIN.textSecondary }}>蓝鲨充电</span> },
-            { title: <span style={{ color: ADMIN.textPrimary, fontWeight: 500 }}>{title}</span> },
-          ]}
-        />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 18, minWidth: 0 }}>
+          <div style={{
+            width: collapsed ? 60 : 180,
+            display: 'flex', alignItems: 'center', gap: 10,
+            transition: 'width .2s',
+            minWidth: 44,
+          }}>
+            <div style={{
+              width: 28, height: 28, borderRadius: 7, flexShrink: 0,
+              background: ADMIN.primary,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#fff', fontSize: 16,
+            }}>
+              <icons.ThunderboltFilled/>
+            </div>
+            {!collapsed && (
+              <span style={{ fontSize: 17, fontWeight: 700, color: ADMIN.textPrimary, whiteSpace: 'nowrap' }}>
+                蓝鲨充电
+              </span>
+            )}
+          </div>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -201,37 +240,10 @@ function AdminLayout({ active, onNav, title, children }) {
   const [collapsed, setCollapsed] = React.useState(
     () => localStorage.getItem('admin_sidebar_collapsed') === '1'
   )
-  const [tags, setTags] = React.useState(() => {
-    try {
-      const saved = localStorage.getItem('admin_tags_v2')
-      if (saved) return JSON.parse(saved)
-    } catch(e) {}
-    return [{ id: 'dashboard', label: '运营看板' }]
-  })
 
   React.useEffect(() => {
-    const navItem = ADMIN_NAV.find(n => n.id === active)
-    if (!navItem) return
-    setTags(prev => {
-      if (prev.some(t => t.id === active)) return prev
-      const next = [...prev, { id: active, label: navItem.label }]
-      localStorage.setItem('admin_tags_v2', JSON.stringify(next))
-      return next
-    })
-  }, [active])
-
-  function closeTag(id) {
-    setTags(prev => {
-      const next = prev.filter(t => t.id !== id)
-      localStorage.setItem('admin_tags_v2', JSON.stringify(next))
-      if (id === active) {
-        const idx = prev.findIndex(t => t.id === id)
-        const fallback = next[Math.min(idx, next.length - 1)]
-        if (fallback) onNav(fallback.id)
-      }
-      return next
-    })
-  }
+    localStorage.removeItem('admin_tags_v2')
+  }, [])
 
   const toggle = () => setCollapsed(v => {
     const next = !v
@@ -239,39 +251,56 @@ function AdminLayout({ active, onNav, title, children }) {
     return next
   })
 
-  const sideW = collapsed ? 64 : 200
-
-  const tabItems = tags.map(tag => ({
-    key:      tag.id,
-    label:    tag.label,
-    closable: tag.id !== 'dashboard',
-  }))
+  const sideW = collapsed ? 80 : 200
 
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: ADMIN.bodyBg }}>
-      <style>{`
-        .admin-tagview .ant-tabs-content-holder { display: none !important; }
-      `}</style>
+    <div style={{ minHeight: '100vh', overflow: 'hidden', background: ADMIN.bodyBg }}>
+      <AdminHeader title={title} collapsed={collapsed}/>
       <AdminSidebar active={active} onNav={onNav} collapsed={collapsed}/>
+      <antd.Button
+        type="default"
+        shape="circle"
+        size="small"
+        onClick={toggle}
+        icon={collapsed ? <icons.RightOutlined/> : <icons.LeftOutlined/>}
+        style={{
+          position: 'fixed',
+          left: sideW - 16,
+          top: 88,
+          zIndex: 120,
+          width: 32,
+          height: 32,
+          color: ADMIN.textSecondary,
+          background: '#fff',
+          borderColor: ADMIN.borderLight,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+          transition: 'left .2s',
+        }}
+      />
       <div style={{
-        marginLeft: sideW, flex: 1,
+        marginLeft: sideW,
         display: 'flex', flexDirection: 'column',
-        height: '100vh', overflow: 'hidden',
+        minHeight: '100vh',
+        paddingTop: 56,
         transition: 'margin-left .2s',
       }}>
-        <AdminHeader title={title} collapsed={collapsed} onToggle={toggle}/>
-        <antd.Tabs
-          className="admin-tagview"
-          type="editable-card"
-          hideAdd
-          size="small"
-          activeKey={active}
-          items={tabItems}
-          onChange={onNav}
-          onEdit={(key, action) => { if (action === 'remove') closeTag(key) }}
-        />
-        <div style={{ flex: 1, overflowY: 'auto', padding: 20 }}>
-          {children}
+        <div style={{
+          height: 'calc(100vh - 56px)',
+          overflowY: 'auto',
+          padding: '24px 32px 32px',
+          background: ADMIN.bodyBg,
+        }}>
+          <div style={{ marginBottom: 16 }}>
+            <antd.Breadcrumb
+              items={[
+                { title: '蓝鲨充电' },
+                { title },
+              ]}
+            />
+          </div>
+          <div>
+            {children}
+          </div>
         </div>
       </div>
     </div>
@@ -567,7 +596,37 @@ function PageHeader({ children }) {
 
 // ─── FilterBar ────────────────────────────────────────────────────
 function FilterBar({ children }) {
-  return <antd.Space wrap>{children}</antd.Space>
+  return <antd.Space wrap size={[16, 16]}>{children}</antd.Space>
+}
+
+function QueryPanel({ children }) {
+  return (
+    <ElCard style={{ marginBottom: 24 }} padding="24px 32px">
+      <FilterBar>{children}</FilterBar>
+    </ElCard>
+  )
+}
+
+function TableCard({ title, extra, children }) {
+  const hasHeader = title || extra
+  return (
+    <ElCard padding="24px 32px">
+      {hasHeader && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: title ? 'space-between' : 'flex-end',
+          gap: 16,
+          marginBottom: 24,
+          minHeight: 32,
+        }}>
+          {title && <div style={{ fontSize: 16, fontWeight: 600, color: ADMIN.textPrimary }}>{title}</div>}
+          {extra && <antd.Space size="middle">{extra}</antd.Space>}
+        </div>
+      )}
+      {children}
+    </ElCard>
+  )
 }
 
 // ─── InfoTip ─── antd Tooltip ─────────────────────────────────────

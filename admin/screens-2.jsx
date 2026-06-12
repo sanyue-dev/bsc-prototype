@@ -466,8 +466,7 @@ function RuleDevicesModal({ rule, onClose }) {
             allowClear prefix={<SearchIcon2/>} style={{ flex:1 }}/>
           <antd.Input placeholder="搜索站点名称" value={stFilter} onChange={e=>setStFilter(e.target.value)}
             allowClear prefix={<SearchIcon2/>} style={{ flex:1 }}/>
-          <antd.Button type="primary" onClick={() => setShowAdd(true)}
-            icon={<svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 1v9M1 5.5h9" stroke="#fff" strokeWidth="1.5" strokeLinecap="round"/></svg>}>
+          <antd.Button type="primary" onClick={() => setShowAdd(true)} icon={<icons.PlusOutlined/>}>
             添加设备
           </antd.Button>
         </div>
@@ -567,17 +566,15 @@ function PricingScreen() {
 
   return (
     <div>
-      <PageHeader>
-        <antd.Button type="primary"
-          icon={<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>}
-          onClick={() => setEditRule('new')}>新建规则</antd.Button>
-      </PageHeader>
-      <antd.Card styles={{ body:{ padding:0 } }}>
+      <TableCard
+        title="规则列表"
+        extra={<antd.Button type="primary" icon={<icons.PlusOutlined/>} onClick={() => setEditRule('new')}>新建规则</antd.Button>}
+      >
         <antd.Table
           dataSource={rules} rowKey="id" columns={columns} pagination={false} size="middle"
           expandable={{ expandedRowRender, expandedRowKeys:expandedKeys, onExpandedRowsChange: keys => setExpandedKeys([...keys]) }}
         />
-      </antd.Card>
+      </TableCard>
 
       {editRule && editRule !== 'new' && (
         <RuleEditModal rule={editRule} onClose={() => setEditRule(null)} onPublish={handlePublish} onDraft={handleDraft}/>
@@ -615,19 +612,17 @@ function UsersScreen() {
 
   return (
     <div>
-      <ElCard padding={0}>
-        <div style={{ padding:'14px 20px', borderBottom:`1px solid ${ADMIN.borderLight}` }}>
-          <FilterBar>
-            <ElInput placeholder="用户昵称" value={nameFilter} onChange={e => { setNameFilter(e.target.value); setPage(1) }} width={150}/>
-            <ElInput placeholder="手机号" value={phoneFilter} onChange={e => { setPhoneFilter(e.target.value); setPage(1) }} width={150}/>
-            <antd.Button onClick={doReset}>重置</antd.Button>
-          </FilterBar>
-        </div>
+      <QueryPanel>
+        <ElInput placeholder="用户昵称" value={nameFilter} onChange={e => { setNameFilter(e.target.value); setPage(1) }} width={150}/>
+        <ElInput placeholder="手机号" value={phoneFilter} onChange={e => { setPhoneFilter(e.target.value); setPage(1) }} width={150}/>
+        <antd.Button onClick={doReset}>重置</antd.Button>
+      </QueryPanel>
+      <TableCard>
         <DataTable data={filtered} columns={columns}/>
         <div style={{ padding:'0 20px 16px' }}>
           <Pagination total={filtered.length} page={page} pageSize={10} onPageChange={setPage}/>
         </div>
-      </ElCard>
+      </TableCard>
     </div>
   )
 }
@@ -706,8 +701,7 @@ function CouponsScreen() {
       onChange={setActiveTab}
       items={tabItems}
       tabBarExtraContent={
-        <antd.Button type="primary"
-          icon={<svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 1v9M1 5.5h9" stroke="#fff" strokeWidth="1.5" strokeLinecap="round"/></svg>}>
+        <antd.Button type="primary" icon={<icons.PlusOutlined/>}>
           {activeTab==='coupons' ? '新建优惠券' : '新建活动'}
         </antd.Button>
       }
