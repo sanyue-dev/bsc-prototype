@@ -1,7 +1,7 @@
 // admin/components.jsx — antd-backed layout shell + shared UI primitives
 // 蓝鲨充电 PC Admin · Ant Design v5
 
-/* global antd */
+/* global antd, icons */
 
 // ─── Color tokens ────────────────────────────────────────────────
 const ADMIN = {
@@ -57,27 +57,17 @@ const ADMIN_NAV = [
   { id: 'coupons',   label: '优惠券管理' },
 ]
 
-// ─── Nav Icons ────────────────────────────────────────────────────
-function AdminNavIcon({ id, className, style }) {
-  const c = 'currentColor'
-  const icons = {
-    dashboard: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="1.5" fill={c} opacity="0.95"/><rect x="13" y="3" width="8" height="4" rx="1.5" fill={c} opacity="0.7"/><rect x="13" y="9" width="8" height="2.5" rx="1.25" fill={c} opacity="0.5"/><rect x="3" y="13" width="4" height="8" rx="1.5" fill={c} opacity="0.6"/><rect x="9" y="13" width="12" height="8" rx="1.5" fill={c} opacity="0.9"/></svg>),
-    stations:  (<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke={c} strokeWidth="1.6" fill="none"/><circle cx="12" cy="9" r="2.5" stroke={c} strokeWidth="1.5" fill="none"/></svg>),
-    devices:   (<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke={c} strokeWidth="1.6" fill="none" strokeLinejoin="round" strokeLinecap="round"/></svg>),
-    tickets:   (<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="18" rx="2" stroke={c} strokeWidth="1.5" fill="none"/><path d="M8 8h8M8 12h8M8 16h5" stroke={c} strokeWidth="1.4" strokeLinecap="round"/></svg>),
-    pricing:   (<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke={c} strokeWidth="1.5" fill="none"/><path d="M12 7v1.5M12 15.5V17" stroke={c} strokeWidth="1.5" strokeLinecap="round"/><path d="M9.5 10.5c0-1.1.9-2 2.5-2s2.5.9 2.5 2c0 2.4-5 2.4-5 4.5 0 1.1.9 2 2.5 2s2.5-.9 2.5-2" stroke={c} strokeWidth="1.4" strokeLinecap="round" fill="none"/></svg>),
-    users:     (<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke={c} strokeWidth="1.5" fill="none"/><path d="M4 20c0-3.8 3.6-6.5 8-6.5s8 2.7 8 6.5" stroke={c} strokeWidth="1.5" strokeLinecap="round" fill="none"/></svg>),
-    orders:    (<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" stroke={c} strokeWidth="1.5" strokeLinecap="round"/><rect x="9" y="3" width="6" height="4" rx="1" stroke={c} strokeWidth="1.5"/><path d="M9 12h6M9 16h4" stroke={c} strokeWidth="1.4" strokeLinecap="round"/></svg>),
-    sessions:  (<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="7" stroke={c} strokeWidth="1.5" fill="none"/><path d="M12 10v3.5l2.5 2" stroke={c} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/><path d="M8.5 3.5h7M12 3.5V6" stroke={c} strokeWidth="1.4" strokeLinecap="round"/></svg>),
-    coupons:   (<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M2 9a2 2 0 012-2h16a2 2 0 012 2v1.5a2 2 0 000 4V16a2 2 0 01-2 2H4a2 2 0 01-2-2v-1.5a2 2 0 000-4V9z" stroke={c} strokeWidth="1.5" fill="none"/><path d="M9 12h6M9 9.5h3" stroke={c} strokeWidth="1.3" strokeLinecap="round"/></svg>),
-    reports:   (<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke={c} strokeWidth="1.5" fill="none"/><path d="M7 16l3-4 3 3 3-5" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>),
-  }
-  const icon = icons[id]
-  if (!icon) return null
-  return React.cloneElement(icon, {
-    className: [icon.props.className, className].filter(Boolean).join(' ') || undefined,
-    style: { ...icon.props.style, ...style },
-  })
+const ADMIN_NAV_ICONS = {
+  dashboard: icons.DashboardOutlined,
+  reports:   icons.BarChartOutlined,
+  orders:    icons.FileTextOutlined,
+  sessions:  icons.ClockCircleOutlined,
+  stations:  icons.EnvironmentOutlined,
+  devices:   icons.ThunderboltOutlined,
+  tickets:   icons.ToolOutlined,
+  pricing:   icons.DollarCircleOutlined,
+  users:     icons.UserOutlined,
+  coupons:   icons.GiftOutlined,
 }
 
 // ─── Logout ───────────────────────────────────────────────────────
@@ -93,11 +83,14 @@ function AdminSidebar({ active, onNav, collapsed }) {
   const Sider = antd.Layout.Sider
   const Menu  = antd.Menu
 
-  const items = ADMIN_NAV.map(item => ({
-    key:   item.id,
-    icon:  <AdminNavIcon id={item.id}/>,
-    label: item.label,
-  }))
+  const items = ADMIN_NAV.map(item => {
+    const Icon = ADMIN_NAV_ICONS[item.id]
+    return {
+      key:   item.id,
+      icon:  <Icon/>,
+      label: item.label,
+    }
+  })
 
   return (
     <Sider
@@ -146,7 +139,7 @@ function AdminSidebar({ active, onNav, collapsed }) {
 }
 
 // ─── AdminHeader ──────────────────────────────────────────────────
-function AdminHeader({ title, onToggle }) {
+function AdminHeader({ title, collapsed, onToggle }) {
   const userMenu = {
     items: [
       { key: 'profile',  label: '个人信息' },
@@ -172,11 +165,7 @@ function AdminHeader({ title, onToggle }) {
           type="text"
           onClick={onToggle}
           style={{ color: ADMIN.textSecondary, padding: '0 6px' }}
-          icon={
-            <svg width="16" height="12" viewBox="0 0 18 14" fill="none">
-              <path d="M1 1h16M1 7h16M1 13h16" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
-            </svg>
-          }
+          icon={collapsed ? <icons.MenuUnfoldOutlined/> : <icons.MenuFoldOutlined/>}
         />
         <span style={{ fontSize: 13, color: ADMIN.textSecondary }}>蓝鲨充电</span>
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -278,7 +267,7 @@ function AdminLayout({ active, onNav, title, children }) {
         height: '100vh', overflow: 'hidden',
         transition: 'margin-left .2s',
       }}>
-        <AdminHeader title={title} onToggle={toggle}/>
+        <AdminHeader title={title} collapsed={collapsed} onToggle={toggle}/>
         <antd.Tabs
           className="admin-tagview"
           type="editable-card"
