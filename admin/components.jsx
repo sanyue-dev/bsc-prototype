@@ -58,7 +58,7 @@ const ADMIN_NAV = [
 ]
 
 // ─── Nav Icons ────────────────────────────────────────────────────
-function AdminNavIcon({ id }) {
+function AdminNavIcon({ id, className, style }) {
   const c = 'currentColor'
   const icons = {
     dashboard: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="1.5" fill={c} opacity="0.95"/><rect x="13" y="3" width="8" height="4" rx="1.5" fill={c} opacity="0.7"/><rect x="13" y="9" width="8" height="2.5" rx="1.25" fill={c} opacity="0.5"/><rect x="3" y="13" width="4" height="8" rx="1.5" fill={c} opacity="0.6"/><rect x="9" y="13" width="12" height="8" rx="1.5" fill={c} opacity="0.9"/></svg>),
@@ -72,7 +72,12 @@ function AdminNavIcon({ id }) {
     coupons:   (<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M2 9a2 2 0 012-2h16a2 2 0 012 2v1.5a2 2 0 000 4V16a2 2 0 01-2 2H4a2 2 0 01-2-2v-1.5a2 2 0 000-4V9z" stroke={c} strokeWidth="1.5" fill="none"/><path d="M9 12h6M9 9.5h3" stroke={c} strokeWidth="1.3" strokeLinecap="round"/></svg>),
     reports:   (<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke={c} strokeWidth="1.5" fill="none"/><path d="M7 16l3-4 3 3 3-5" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>),
   }
-  return icons[id] || null
+  const icon = icons[id]
+  if (!icon) return null
+  return React.cloneElement(icon, {
+    className: [icon.props.className, className].filter(Boolean).join(' ') || undefined,
+    style: { ...icon.props.style, ...style },
+  })
 }
 
 // ─── Logout ───────────────────────────────────────────────────────
@@ -130,6 +135,7 @@ function AdminSidebar({ active, onNav, collapsed }) {
       <Menu
         theme="dark"
         mode="inline"
+        inlineCollapsed={collapsed}
         selectedKeys={[active]}
         items={items}
         onClick={({ key }) => onNav(key)}
