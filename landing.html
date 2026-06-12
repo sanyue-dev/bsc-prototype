@@ -7,31 +7,32 @@
 <link rel="preconnect" href="https://fonts.googleapis.cn"/>
 <link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin="anonymous"/>
 <link href="https://fonts.googleapis.cn/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="shared/theme.css"/>
 <style>
 /* ── reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ── tokens (exact eco-theme values from ui.jsx) ── */
+/* ── 本地别名 → shared/theme.css tokens ── */
 :root {
-  --green:      #1A9E6E;
-  --green2:     #28B47E;
-  --greenDark:  #127A54;
-  --greenTint:  #E4F1EA;
-  --greenTint2: #F0FBF5;
-  --bg0:        #F0F5F2;
-  --bg1:        #F5F8F6;
-  --surface:    #FFFFFF;
-  --line:       #DCE8E1;
-  --lineSoft:   #EBF2EE;
-  --text:       #111816;
-  --muted:      #566961;
-  --dim:        #96A69D;
-  --dark:       #060F0B;
-  --darkSurf:   rgba(10,36,24,.84);
-  --darkLine:   rgba(60,160,100,.22);
-  --warning:    #B07010;
-  --danger:     #C43030;
-  --radius:     10px;
+  --green:     var(--color-primary);
+  --green2:    var(--color-primary-2);
+  --greenDark: var(--color-primary-dark);
+  --greenTint: var(--color-primary-tint);
+  --greenTint2:var(--color-bg-0);
+  --bg0:       var(--color-bg-0);
+  --bg1:       var(--color-bg-1);
+  --surface:   var(--color-surface);
+  --line:      var(--color-line);
+  --lineSoft:  var(--color-line-soft);
+  --text:      var(--color-text);
+  --muted:     var(--color-text-muted);
+  --dim:       var(--color-text-dim);
+  --dark:      var(--color-immerse-bg);
+  --darkSurf:  var(--color-immerse-surface);
+  --darkLine:  var(--color-immerse-line);
+  --warning:   var(--color-warning);
+  --danger:    var(--color-danger);
+  --radius:    var(--radius-md);
 }
 
 html { scroll-behavior: smooth; }
@@ -198,7 +199,7 @@ h1.hero-h1 .hl { color: var(--green); }
 .how-bg { background: var(--surface); }
 
 .steps {
-  display: grid; grid-template-columns: repeat(4,1fr);
+  display: grid; grid-template-columns: repeat(5,1fr);
   position: relative;
 }
 .steps::before {
@@ -249,6 +250,18 @@ h1.hero-h1 .hl { color: var(--green); }
 }
 .feat-h { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
 .feat-p { font-size: 13px; color: var(--muted); line-height: 1.65; }
+.feat-card--wide { grid-column: span 2; }
+.feat-badges { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+.feat-badge {
+  font-size: 12px; font-weight: 600; padding: 4px 10px;
+  border-radius: 20px; border: 1px solid;
+}
+.feat-badge--normal {
+  color: #1A9E6E; background: rgba(26,158,110,.08); border-color: rgba(26,158,110,.25);
+}
+.feat-badge--warn {
+  color: #b45309; background: rgba(180,83,9,.06); border-color: rgba(180,83,9,.2);
+}
 
 /* ── CHARGING PREVIEW (dark immersive) ── */
 .charge-sec {
@@ -622,8 +635,8 @@ footer {
 <section class="sec how-bg" id="how">
   <div class="sec-inner">
     <p class="sec-tag rv">充电流程</p>
-    <h2 class="sec-h2 rv">四步，充好一次电</h2>
-    <p class="sec-lead rv">无需下载 APP，微信扫码即用，充满自动断电，全程手机掌控。</p>
+    <h2 class="sec-h2 rv">五步，充好一次电</h2>
+    <p class="sec-lead rv">无需下载 APP，微信扫码即用，功率降至阈值自动停充，全程手机掌控。</p>
 
     <div class="steps sg">
       <div class="step">
@@ -637,6 +650,18 @@ footer {
         </div>
         <div class="step-h">微信扫码</div>
         <div class="step-p">对准充电柜上的二维码，打开微信扫一扫，自动跳转小程序</div>
+      </div>
+
+      <div class="step">
+        <div class="step-ring">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <rect x="4" y="6" width="16" height="12" rx="2" stroke="#1A9E6E" stroke-width="2"/>
+            <path d="M8 6V4M16 6V4" stroke="#1A9E6E" stroke-width="2" stroke-linecap="round"/>
+            <path d="M9 13l2 2 4-4" stroke="#1A9E6E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="step-h">余额充值</div>
+        <div class="step-p">首次使用需充值钱包余额，余额须达到最低金额方可开启充电</div>
       </div>
 
       <div class="step">
@@ -669,8 +694,8 @@ footer {
             <path d="M8 12l3 3 5-6" stroke="#1A9E6E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
-        <div class="step-h">充满结算</div>
-        <div class="step-p">充满自动断电，微信扣费，账单实时可查</div>
+        <div class="step-h">自停扣费</div>
+        <div class="step-p">自动停充后从钱包余额扣除费用，账单实时可查</div>
       </div>
     </div>
   </div>
@@ -691,19 +716,27 @@ footer {
             <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" stroke="#1A9E6E" stroke-width="1.8" stroke-linejoin="round"/>
           </svg>
         </div>
-        <div class="feat-h">实时电量监控</div>
-        <div class="feat-p">精准计量每个端口用电量，实时推送充电进度，随时掌握充电状态。</div>
+        <div class="feat-h">实时功率监控</div>
+        <div class="feat-p">实时监测每个端口充电功率，功率持续下降至阈值时自动识别充电完成，随时掌握充电状态。</div>
       </div>
 
-      <div class="feat-card">
+      <div class="feat-card feat-card--wide">
         <div class="feat-ico">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
             <path d="M12 2l7 3v6c0 5-3 8-7 9-4-1-7-4-7-9V5l7-3z" stroke="#1A9E6E" stroke-width="1.8" stroke-linejoin="round"/>
             <path d="M9 12l2 2 4-4" stroke="#1A9E6E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
-        <div class="feat-h">过充自动断电</div>
-        <div class="feat-p">充满即停，智能保护电池健康，有效延长使用寿命，杜绝安全隐患。</div>
+        <div class="feat-h">多重安全保护，自动停充</div>
+        <div class="feat-p">设备持续监测功率与电气状态，触发任一条件即立刻断电保护，空载不计费。</div>
+        <div class="feat-badges">
+          <span class="feat-badge feat-badge--normal">充满停充</span>
+          <span class="feat-badge feat-badge--warn">空载停充</span>
+          <span class="feat-badge feat-badge--warn">过压保护</span>
+          <span class="feat-badge feat-badge--warn">欠压保护</span>
+          <span class="feat-badge feat-badge--warn">过载保护</span>
+          <span class="feat-badge feat-badge--warn">高温保护</span>
+        </div>
       </div>
 
       <div class="feat-card">
@@ -767,7 +800,7 @@ footer {
       </div>
       <h2 class="charge-h2">充满自停<br/>全程安心</h2>
       <p class="charge-lead">
-        蓝鲨充电柜实时监控每个端口的充电状态，电量满载即刻切断，
+        蓝鲨充电柜实时监测每个端口充电功率，功率降至阈值时自动断电，
         手机端同步推送通知，让每一次充电都简单放心。
       </p>
       <div class="charge-stats">
@@ -836,9 +869,9 @@ footer {
         <circle cx="150" cy="150" r="76" fill="rgba(26,158,110,.06)"/>
 
         <!-- center: percentage -->
-        <text x="150" y="136" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.45)" font-family="system-ui" letter-spacing="1.5">当前电量</text>
-        <text x="150" y="178" text-anchor="middle" font-size="56" font-weight="900" fill="#fff" font-family="system-ui" letter-spacing="-2">68</text>
-        <text x="150" y="198" text-anchor="middle" font-size="18" fill="rgba(255,255,255,.55)" font-family="system-ui">%</text>
+        <text x="150" y="136" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.45)" font-family="system-ui" letter-spacing="1.5">当前功率</text>
+        <text x="150" y="178" text-anchor="middle" font-size="56" font-weight="900" fill="#fff" font-family="system-ui" letter-spacing="-2">180</text>
+        <text x="150" y="198" text-anchor="middle" font-size="18" fill="rgba(255,255,255,.55)" font-family="system-ui">W</text>
 
         <!-- bottom label -->
         <rect x="104" y="214" width="92" height="26" rx="13" fill="rgba(26,158,110,.18)" stroke="rgba(26,158,110,.4)" stroke-width="1"/>

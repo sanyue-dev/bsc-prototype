@@ -6,6 +6,10 @@
 <title>蓝鲨充电 · 运营管理平台</title>
 <script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<!-- Ant Design v5 -->
+<link rel="stylesheet" href="https://unpkg.com/antd@5.21.0/dist/reset.css"/>
+<script src="https://unpkg.com/dayjs@1.11.10/dayjs.min.js"></script>
+<script src="https://unpkg.com/antd@5.21.0/dist/antd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,12 +26,12 @@
 </head>
 <body>
 <div id="root"></div>
-<script type="text/babel" src="admin-components.jsx"></script>
-<script type="text/babel" src="admin-login.jsx"></script>
-<script type="text/babel" src="admin-screens-1.jsx"></script>
-<script type="text/babel" src="admin-screens-2.jsx"></script>
-<script type="text/babel" src="admin-screens-3.jsx"></script>
-<script type="text/babel" src="admin-screens-4.jsx"></script>
+<script type="text/babel" src="admin/components.jsx"></script>
+<script type="text/babel" src="admin/login.jsx"></script>
+<script type="text/babel" src="admin/screens-1.jsx"></script>
+<script type="text/babel" src="admin/screens-2.jsx"></script>
+<script type="text/babel" src="admin/screens-3.jsx"></script>
+<script type="text/babel" src="admin/screens-4.jsx"></script>
 
 <!-- ── Root App ───────────────────────────────────────────────── -->
 <script type="text/babel">
@@ -80,10 +84,30 @@ function App() {
     return () => { window.__onAdminLogout = null }
   }, [])
 
-  if (!loggedIn) {
-    return <LoginPage onLogin={() => setLoggedIn(true)}/>
-  }
-  return <AdminApp/>
+  const content = loggedIn
+    ? <AdminApp/>
+    : <LoginPage onLogin={() => setLoggedIn(true)}/>
+
+  return (
+    <antd.ConfigProvider theme={{
+      token: {
+        colorPrimary:  '#409eff',
+        colorSuccess:  '#67c23a',
+        colorWarning:  '#e6a23c',
+        colorError:    '#f56c6c',
+        borderRadius:  4,
+        fontSize:      13,
+        fontFamily:    "-apple-system, 'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', sans-serif",
+      },
+      components: {
+        Menu: { darkItemBg: '#001529', darkSubMenuItemBg: '#0f2438' },
+      },
+    }}>
+      <antd.App>
+        {content}
+      </antd.App>
+    </antd.ConfigProvider>
+  )
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>)

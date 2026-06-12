@@ -363,7 +363,7 @@ function MessagesScreen({ theme, nav }) {
 }
 
 // ─── ProfileScreen — 个人中心 ────────────────────────────────────
-function ProfileScreen({ theme, nav }) {
+function ProfileScreen({ theme, nav, onRoleSwitch }) {
   return (
     <>
       <NativeTitleBar
@@ -456,6 +456,35 @@ function ProfileScreen({ theme, nav }) {
               ))}
             </div>
           </Card>
+        </div>
+
+        {/* ── role switcher ── */}
+        <div style={{ padding: '14px 16px 0' }}>
+          <div
+            onClick={() => onRoleSwitch && onRoleSwitch('operator')}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 14,
+              padding: '14px 16px', borderRadius: 14,
+              background: `linear-gradient(135deg, ${theme.primary}18 0%, ${theme.accent}12 100%)`,
+              border: `1px solid ${theme.primary}30`,
+              cursor: 'pointer',
+            }}
+          >
+            <div style={{
+              width: 40, height: 40, borderRadius: 11, flexShrink: 0,
+              background: theme.primary,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Icon name="chart" size={20} color="#fff"/>
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: theme.text }}>切换至运营商端</div>
+              <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 2 }}>管理站点 · 查看营收 · 处理工单</div>
+            </div>
+            <svg width="6" height="10" viewBox="0 0 6 10" fill="none" style={{ opacity: 0.45, flexShrink: 0 }}>
+              <path d="M1 1l4 4-4 4" stroke={theme.text} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
         </div>
 
         {/* ── service list ── */}

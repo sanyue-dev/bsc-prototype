@@ -1,0 +1,58 @@
+/*
+ * 蓝鲨充电 · 共享设计 Token
+ * eco 绿主题，供 landing.html 和 mobile 端共用
+ *
+ * landing.html  → <link rel="stylesheet" href="shared/theme.css">
+ * mobile/ui.jsx → THEMES.eco 对象镜像此文件的值（JS 运行时需要），两者保持同步
+ */
+
+:root {
+  /* ── 主色 ── */
+  --color-primary:       #1A9E6E;
+  --color-primary-2:     #28B47E;
+  --color-primary-dark:  #127A54;
+  --color-primary-glow:  rgba(26, 158, 110, 0.15);
+  --color-primary-tint:  #E4F1EA;   /* surfaceTint */
+
+  /* ── 背景层 ── */
+  --color-bg-0:          #F0F5F2;   /* 最深背景 */
+  --color-bg-1:          #F5F8F6;   /* 页面背景 */
+  --color-bg-2:          #FFFFFF;
+  --color-surface:       #FFFFFF;
+  --color-surface-hi:    #FAFCFA;
+  --color-surface-flat:  #FFFFFF;
+
+  /* ── 边框 ── */
+  --color-line:          #DCE8E1;
+  --color-line-soft:     #EBF2EE;
+
+  /* ── 文字 ── */
+  --color-text:          #111816;
+  --color-text-muted:    #566961;
+  --color-text-dim:      #96A69D;
+
+  /* ── 语义色 ── */
+  --color-success:       #1A9E6E;   /* eco 主色即成功色 */
+  --color-warning:       #B07010;
+  --color-danger:        #C43030;
+
+  /* ── 沉浸模式（扫码/充电中暗色屏）── */
+  --color-immerse-bg:      #060F0B;
+  --color-immerse-surface: rgba(10, 36, 24, 0.82);
+  --color-immerse-line:    rgba(60, 160, 100, 0.22);
+
+  /* ── 圆角 ── */
+  --radius-sm:    6px;
+  --radius-md:    10px;
+  --radius-lg:    14px;
+  --radius-xl:    20px;
+  --radius-pill:  999px;
+
+  /* ── 间距基准 ── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-6:  24px;
+  --space-8:  32px;
+}

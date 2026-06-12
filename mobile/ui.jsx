@@ -1,117 +1,36 @@
 // ui.jsx — shared design system: theme, status bar, WeChat header, tab bar, icons, primitives
 
-// ─── theme palettes (LIGHT) ────────────────────────────────────
+// ─── 品牌主题（eco 环保绿，从 shared/theme.css 读取，自动同步）─────
+function _css(v) {
+  return getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+}
+
 const THEMES = {
-  tech: { // 科技蓝 — bright primary on cool white
-    name: '科技蓝',
-    bg0: '#EEF2FA', bg1: '#F4F7FC', bg2: '#FFFFFF',
-    surface: '#FFFFFF',
-    surfaceFlat: '#FFFFFF',
-    surfaceHi: '#F8FAFE',
-    surfaceTint: '#EAF0FF',     // very-light blue surface (chips, hovers)
-    line: '#E5EAF3',
-    lineSoft: '#EEF1F6',
-    text: '#0F1B36', textMuted: '#5C6B89', textDim: '#94A0B8',
-    primary: '#2E5BFF',
-    primary2: '#5A7CFF',
-    primaryDark: '#1E3FB8',
-    glow: 'rgba(46,91,255,0.22)',
-    accent: '#0099FF',
-    success: '#10B981',
-    warning: '#F59E0B',
-    danger: '#EF4444',
-    // for "dark immersive" sub-screens (scan, charging dial)
-    immerseBg: '#070D22',
-    immerseSurface: 'rgba(20,30,72,0.78)',
-    immerseLine: 'rgba(120,150,220,0.22)',
-  },
-  deep: { // 深海蓝 — slightly deeper, navy-leaning
-    name: '深海蓝',
-    bg0: '#EAEFF9', bg1: '#F1F5FC', bg2: '#FFFFFF',
-    surface: '#FFFFFF',
-    surfaceFlat: '#FFFFFF',
-    surfaceHi: '#F6F9FE',
-    surfaceTint: '#E5ECFB',
-    line: '#E1E7F2',
-    lineSoft: '#EBEFF7',
-    text: '#0A1530', textMuted: '#536183', textDim: '#8E9AB4',
-    primary: '#1B4FE0',
-    primary2: '#3D6CF0',
-    primaryDark: '#143BAA',
-    glow: 'rgba(27,79,224,0.22)',
-    accent: '#2D7BFF',
-    success: '#0EA471',
-    warning: '#E08A00',
-    danger: '#E0354B',
-    immerseBg: '#04081A',
-    immerseSurface: 'rgba(12,28,68,0.82)',
-    immerseLine: 'rgba(100,140,200,0.22)',
-  },
-  electric: { // 亮电蓝 — cyan-leaning, fresh
-    name: '亮电蓝',
-    bg0: '#E8F4FF', bg1: '#F1F8FF', bg2: '#FFFFFF',
-    surface: '#FFFFFF',
-    surfaceFlat: '#FFFFFF',
-    surfaceHi: '#F4FAFF',
-    surfaceTint: '#DBEEFF',
-    line: '#D9E6F4',
-    lineSoft: '#E8F0F9',
-    text: '#0E1B33', textMuted: '#52617F', textDim: '#8D9AB3',
-    primary: '#0E7CFF',
-    primary2: '#3D96FF',
-    primaryDark: '#0058C7',
-    glow: 'rgba(14,124,255,0.25)',
-    accent: '#00C8FF',
-    success: '#10B981',
-    warning: '#F59E0B',
-    danger: '#EF4444',
-    immerseBg: '#04102A',
-    immerseSurface: 'rgba(16,38,90,0.82)',
-    immerseLine: 'rgba(110,200,255,0.22)',
-  },
-  eco: { // 草绿·环保 — single accent, black/white/gray base
-    name: '环保绿',
-    bg0: '#F0F5F2', bg1: '#F5F8F6', bg2: '#FFFFFF',
-    surface: '#FFFFFF',
-    surfaceFlat: '#FFFFFF',
-    surfaceHi: '#FAFCFA',
-    surfaceTint: '#E4F1EA',
-    line: '#DCE8E1',
-    lineSoft: '#EBF2EE',
-    text: '#111816', textMuted: '#566961', textDim: '#96A69D',
-    primary: '#1A9E6E',
-    primary2: '#28B47E',
-    primaryDark: '#127A54',
-    glow: 'rgba(26,158,110,0.15)',
-    accent: '#1A9E6E',
-    success: '#1A9E6E',
-    warning: '#B07010',
-    danger: '#C43030',
-    immerseBg: '#060F0B',
-    immerseSurface: 'rgba(10,36,24,0.82)',
-    immerseLine: 'rgba(60,160,100,0.22)',
-  },
-  smartisan: { // 锤子OS风格 — Synkro蓝 + 纯白 + 深灰
-    name: '锤子',
-    bg0: '#EFEFEF', bg1: '#F7F7F7', bg2: '#FAFAFA',
-    surface: '#FFFFFF',
-    surfaceFlat: '#F7F7F7',
-    surfaceHi: '#FAFAFA',
-    surfaceTint: '#EAF2FF',
-    line: 'rgba(0,0,0,0.09)',
-    lineSoft: 'rgba(0,0,0,0.05)',
-    text: '#1A1A1A', textMuted: '#666666', textDim: '#999999',
-    primary: '#4A90D9',
-    primary2: '#5CA3E8',
-    primaryDark: '#3070B8',
-    glow: 'rgba(74,144,217,0.18)',
-    accent: '#4A90D9',
-    success: '#34C759',
-    warning: '#FF9500',
-    danger: '#FF3B30',
-    immerseBg: '#1A1A1A',
-    immerseSurface: 'rgba(44,44,44,0.94)',
-    immerseLine: 'rgba(255,255,255,0.08)',
+  eco: {
+    name:        '环保绿',
+    bg0:         _css('--color-bg-0'),
+    bg1:         _css('--color-bg-1'),
+    bg2:         _css('--color-bg-2'),
+    surface:     _css('--color-surface'),
+    surfaceFlat: _css('--color-surface-flat'),
+    surfaceHi:   _css('--color-surface-hi'),
+    surfaceTint: _css('--color-primary-tint'),
+    line:        _css('--color-line'),
+    lineSoft:    _css('--color-line-soft'),
+    text:        _css('--color-text'),
+    textMuted:   _css('--color-text-muted'),
+    textDim:     _css('--color-text-dim'),
+    primary:     _css('--color-primary'),
+    primary2:    _css('--color-primary-2'),
+    primaryDark: _css('--color-primary-dark'),
+    glow:        _css('--color-primary-glow'),
+    accent:      _css('--color-primary'),
+    success:     _css('--color-success'),
+    warning:     _css('--color-warning'),
+    danger:      _css('--color-danger'),
+    immerseBg:      _css('--color-immerse-bg'),
+    immerseSurface: _css('--color-immerse-surface'),
+    immerseLine:    _css('--color-immerse-line'),
   },
 };
 
@@ -260,78 +179,131 @@ function TabBar({ active, onTab, theme }) {
   const allTabs = [
     { id: 'home',    label: '首页',  icon: 'home' },
     { id: 'savings', label: '省钱',  icon: 'coupon' },
-    { id: 'scan',    label: '扫一扫', icon: 'scan' },
+    { id: 'scan',    label: null,    icon: 'scan' },
     { id: 'shop',    label: '商城',  icon: 'shop' },
     { id: 'profile', label: '我的',  icon: 'user' },
   ];
+  const LIFT = 26;
+  const BAR_H = 56;
+  const SAFE = 34; // iOS home indicator safe area
+  const BTN = 64;
+  const totalH = LIFT + BAR_H + SAFE;
   return (
-    <div style={{
-      height: 56,
-      display: 'flex', alignItems: 'stretch',
-      background: '#FFFFFF',
-      borderTop: '1px solid rgba(0,0,0,0.09)',
-    }}>
-      {allTabs.map(t => {
-        const on = active === t.id;
-        return (
-          <div key={t.id} onClick={() => onTab(t.id)} style={{
-            flex: 1,
-            display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center',
-            gap: 3,
-            cursor: 'pointer',
-            background: 'transparent',
-                        paddingBottom: 4,
-          }}>
-            {/* icon with blue stroke circle when active */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32 }}>
-              <Icon name={t.icon} size={22} color={on ? theme.primary : '#BBBBBB'} filled={on}/>
+    <div style={{ height: totalH, position: 'relative', flexShrink: 0 }}>
+      {/* white bar — covers tab items + safe area */}
+      <div style={{
+        position: 'absolute', bottom: 0, left: 0, right: 0,
+        height: BAR_H + SAFE,
+        background: '#fff',
+        borderTop: '1px solid rgba(0,0,0,0.08)',
+      }}/>
+      {/* tab items row — sits above safe area */}
+      <div style={{
+        position: 'absolute', bottom: SAFE, left: 0, right: 0,
+        height: LIFT + BAR_H,
+        display: 'flex', alignItems: 'flex-end',
+      }}>
+        {allTabs.map(t => {
+          const on = active === t.id;
+          const isScan = t.id === 'scan';
+          if (isScan) {
+            // Bottom of circle aligns with bottom of other tabs' text labels
+            // Other tabs: paddingBottom:4 + label ~14px → text bottom ≈ 4px from tab bottom
+            // Circle bottom = 4px from container bottom → matches
+            return (
+              <div key={t.id} onClick={() => onTab(t.id)} style={{
+                flex: 1, height: LIFT + BAR_H,
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'flex-end',
+                paddingBottom: 4,
+                cursor: 'pointer',
+              }}>
+                <div style={{
+                  width: BTN, height: BTN,
+                  borderRadius: '50%',
+                  background: theme.primary,
+                  boxShadow: `0 4px 14px ${theme.glow}, 0 1px 4px rgba(0,0,0,0.10)`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  border: '4px solid #fff',
+                  flexShrink: 0,
+                }}>
+                  <Icon name="scan" size={26} color="#fff" filled={true}/>
+                </div>
+              </div>
+            );
+          }
+          return (
+            <div key={t.id} onClick={() => onTab(t.id)} style={{
+              flex: 1, height: BAR_H,
+              display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'center',
+              gap: 3, cursor: 'pointer', paddingTop: 8, paddingBottom: 4,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32 }}>
+                <Icon name={t.icon} size={22} color={on ? theme.primary : '#BBBBBB'} filled={on}/>
+              </div>
+              <span style={{
+                fontSize: 10, fontWeight: on ? 600 : 400,
+                color: on ? theme.primary : '#BBBBBB',
+                letterSpacing: 0.1,
+              }}>{t.label}</span>
             </div>
-            <span style={{
-              fontSize: 10, fontWeight: on ? 600 : 400,
-              color: on ? theme.primary : '#BBBBBB',
-              letterSpacing: 0.1,
-            }}>{t.label}</span>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 }
 
-// ─── operator tab bar ────────────────────────────────────────────
+// ─── operator tab bar ─────────────────────────────────────────────
+// Uses same BAR_H / SAFE constants as TabBar for visual unity.
 function OperatorTabBar({ active, onTab, theme }) {
+  const BAR_H = 56;
+  const SAFE  = 34;
   const tabs = [
-    { id: 'op-dashboard', label: '看板', icon: 'chart' },
-    { id: 'op-stations', label: '站点', icon: 'station' },
-    { id: 'op-devices',  label: '设备', icon: 'plug' },
-    { id: 'op-tickets',  label: '工单', icon: 'ticket' },
+    { id: 'op-dashboard', label: '看板', icon: 'chart'   },
+    { id: 'op-stations',  label: '站点', icon: 'station' },
+    { id: 'op-devices',   label: '设备', icon: 'plug'    },
+    { id: 'op-tickets',   label: '工单', icon: 'ticket'  },
+    { id: 'op-pricing',   label: '计费', icon: 'coin'    },
   ];
   return (
-    <div style={{
-      height: 56,
-      display: 'flex', alignItems: 'stretch',
-      background: '#FFFFFF',
-      borderTop: '1px solid rgba(0,0,0,0.09)',
-    }}>
-      {tabs.map(t => {
-        const on = active === t.id;
-        return (
-          <div key={t.id} onClick={() => onTab(t.id)} style={{
-            flex: 1,
-            display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center',
-            gap: 3, cursor: 'pointer',
-            background: 'transparent',
-                        paddingBottom: 4,
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32 }}>
-              <Icon name={t.icon} size={22} color={on ? theme.primary : '#BBBBBB'} filled={on}/>
+    <div style={{ height: BAR_H + SAFE, position: 'relative', flexShrink: 0 }}>
+      {/* white bar + safe area */}
+      <div style={{
+        position: 'absolute', bottom: 0, left: 0, right: 0,
+        height: BAR_H + SAFE,
+        background: '#fff',
+        borderTop: '1px solid rgba(0,0,0,0.08)',
+      }}/>
+      {/* tab items row — sits above safe area */}
+      <div style={{
+        position: 'absolute', bottom: SAFE, left: 0, right: 0,
+        height: BAR_H,
+        display: 'flex', alignItems: 'stretch',
+      }}>
+        {tabs.map(t => {
+          const on = active === t.id;
+          return (
+            <div key={t.id} onClick={() => onTab(t.id)} style={{
+              flex: 1,
+              display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'center',
+              gap: 3, cursor: 'pointer',
+              paddingTop: 8, paddingBottom: 4,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32 }}>
+                <Icon name={t.icon} size={22} color={on ? theme.primary : '#BBBBBB'} filled={on}/>
+              </div>
+              <span style={{
+                fontSize: 10, fontWeight: on ? 600 : 400,
+                color: on ? theme.primary : '#BBBBBB',
+                letterSpacing: 0.1,
+              }}>{t.label}</span>
             </div>
-            <span style={{ fontSize: 10, fontWeight: on ? 600 : 400, color: on ? theme.primary : '#BBBBBB' }}>{t.label}</span>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 }

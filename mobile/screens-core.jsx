@@ -5,6 +5,90 @@
 //   StationScreen        站点详情 (H5)
 //   PricingScreen        计费规则 (H5)
 
+// ─── BannerCarousel ─────────────────────────────────────────────
+function BannerCarousel({ theme }) {
+  const BANNERS = [
+    { dark: true,  tag: '限时活动', title: '充值立享好礼',   sub: '充 50 元送 5 元赠送金额',  cta: '了解' },
+    { dark: false, tag: '月卡特惠', title: '畅充无忧月卡',   sub: '全网通用 · 仅 ¥15/月',     cta: '立即购买' },
+    { dark: false, tag: '新站开业', title: '蓝桥科技园新站', sub: '已上线 16 个桩位',          cta: '查看' },
+  ];
+  const [idx, setIdx] = React.useState(0);
+  const stripRef = React.useRef(null);
+
+  const handleScroll = () => {
+    const el = stripRef.current;
+    if (!el) return;
+    setIdx(Math.round(el.scrollLeft / el.offsetWidth));
+  };
+
+  const goTo = (i) => {
+    const el = stripRef.current;
+    if (!el) return;
+    el.scrollTo({ left: i * el.offsetWidth, behavior: 'smooth' });
+  };
+
+  return (
+    <div style={{ padding: '0 16px 4px' }}>
+      {/* swipeable strip */}
+      <div
+        ref={stripRef}
+        onScroll={handleScroll}
+        className="noscroll"
+        style={{
+          display: 'flex',
+          overflowX: 'scroll',
+          scrollSnapType: 'x mandatory',
+          WebkitOverflowScrolling: 'touch',
+          borderRadius: 12,
+        }}
+      >
+        {BANNERS.map((b, i) => {
+          const bg       = b.dark ? '#1A1A1A' : '#FFFFFF';
+          const tc       = b.dark ? '#FFFFFF' : '#1A1A1A';
+          const tagBg    = b.dark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.06)';
+          const tagColor = b.dark ? 'rgba(255,255,255,0.55)' : '#999999';
+          const subColor = b.dark ? 'rgba(255,255,255,0.45)' : theme.textMuted;
+          return (
+            <div key={i} style={{
+              minWidth: '100%', height: 110, flexShrink: 0,
+              scrollSnapAlign: 'start',
+              background: bg,
+              border: b.dark ? 'none' : `1px solid ${theme.line}`,
+              padding: '14px 18px',
+              display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+              boxSizing: 'border-box',
+            }}>
+              <span style={{
+                fontSize: 10, fontWeight: 600, letterSpacing: 0.8,
+                color: tagColor, background: tagBg,
+                borderRadius: 3, padding: '2px 6px', alignSelf: 'flex-start',
+              }}>{b.tag}</span>
+              <div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: tc, letterSpacing: -0.3, lineHeight: 1.2 }}>{b.title}</div>
+                <div style={{ fontSize: 11, color: subColor, marginTop: 2 }}>{b.sub}</div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: theme.primary, letterSpacing: 0.3 }}>{b.cta} →</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {/* dot indicators */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 5, marginTop: 8 }}>
+        {BANNERS.map((_, i) => (
+          <div key={i} onClick={() => goTo(i)} style={{
+            height: 4, borderRadius: 999, cursor: 'pointer',
+            width: i === idx ? 18 : 4,
+            background: i === idx ? theme.primary : `${theme.primary}44`,
+            transition: 'all 0.3s ease',
+          }}/>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── HomeScreen (原生) ────────────────────────────────────────────
 function HomeScreen({ theme, nav }) {
   return (
@@ -32,49 +116,7 @@ function HomeScreen({ theme, nav }) {
         </div>
 
         {/* banner carousel */}
-        <div style={{ padding: '0 0 12px', overflow: 'hidden' }}>
-          <div style={{
-            display: 'flex', gap: 10, overflowX: 'auto',
-            padding: '0 16px 4px',
-            scrollSnapType: 'x mandatory',
-          }} className="noscroll">
-            {[
-              { dark: true,  tag: '限时活动', title: '充值立享好礼', sub: '充 50 元送 5 元赠送金额', cta: '了解' },
-              { dark: false, tag: '月卡特惠', title: '畅充无忧月卡', sub: '全网通用 · 仅 ¥15/月',  cta: '立即购买' },
-              { dark: false, tag: '新站开业', title: '蓝桥科技园新站', sub: '已上线 16 个桩位',    cta: '查看' },
-            ].map((b, i) => {
-              const bg  = b.dark ? '#1A1A1A' : '#FFFFFF';
-              const tc  = b.dark ? '#FFFFFF' : '#1A1A1A';
-              const tagBg    = b.dark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.06)';
-              const tagColor = b.dark ? 'rgba(255,255,255,0.55)' : '#999999';
-              const subColor = b.dark ? 'rgba(255,255,255,0.45)' : theme.textMuted;
-              return (
-                <div key={i} style={{
-                  minWidth: 'calc(100% - 32px)', height: 110, borderRadius: 12,
-                  background: bg, flexShrink: 0,
-                  scrollSnapAlign: 'start',
-                  border: b.dark ? 'none' : `1px solid ${theme.line}`,
-                  padding: '14px 18px',
-                  display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-                  boxSizing: 'border-box',
-                }}>
-                  <span style={{
-                    fontSize: 10, fontWeight: 600, letterSpacing: 0.8,
-                    color: tagColor, background: tagBg,
-                    borderRadius: 3, padding: '2px 6px', alignSelf: 'flex-start',
-                  }}>{b.tag}</span>
-                  <div>
-                    <div style={{ fontSize: 20, fontWeight: 800, color: tc, letterSpacing: -0.3, lineHeight: 1.2 }}>{b.title}</div>
-                    <div style={{ fontSize: 11, color: subColor, marginTop: 2 }}>{b.sub}</div>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: theme.primary, letterSpacing: 0.3 }}>{b.cta} →</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <BannerCarousel theme={theme} />
 
         {/* search bar — sticky below logo bar */}
         <div style={{
@@ -962,6 +1004,6 @@ function AdCard({ theme }) {
 }
 
 Object.assign(window, {
-  HomeScreen, ScanScreen, MapScreen, StationScreen, PricingScreen,
+  BannerCarousel, HomeScreen, ScanScreen, MapScreen, StationScreen, PricingScreen,
   NEARBY_STATIONS, StationCard,
 });

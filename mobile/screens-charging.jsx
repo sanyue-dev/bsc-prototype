@@ -136,11 +136,11 @@ function ChargingScreen({ theme, nav }) {
   const minutes = 138 + Math.floor(tick / 60);
   const seconds = tick % 60;
   const kwh = (0.37 + tick * (0.160 / 3600)).toFixed(3);
+  const watts = Math.round(160 + Math.sin(tick / 8) * 14);
   const tier = watts <= 100 ? '档位一' : watts <= 200 ? '档位二' : watts <= 300 ? '档位三' : '档位四';
   const serviceFee = (1.15 + tick * (0.50 / 3600)).toFixed(2);
   const elecFee = (parseFloat(kwh) * 0.60).toFixed(2);
   const cost = (parseFloat(serviceFee) + parseFloat(elecFee)).toFixed(2);
-  const watts = Math.round(160 + Math.sin(tick / 8) * 14);
 
   return (
     <div style={{
@@ -179,7 +179,7 @@ function ChargingScreen({ theme, nav }) {
             <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 4 }}>已充电时长</div>
             <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 6 }}>
               <span style={{ width: 7, height: 7, borderRadius: 999, background: theme.success, boxShadow: `0 0 8px ${theme.success}` }} className="blink"/>
-              <span className="mono" style={{ fontSize: 12, color: theme.success, fontWeight: 700, letterSpacing: 0.5 }}>{watts}W · 档位一</span>
+              <span className="mono" style={{ fontSize: 12, color: theme.success, fontWeight: 700, letterSpacing: 0.5 }}>{watts}W · {tier}</span>
             </div>
           </div>
         </div>
@@ -484,11 +484,11 @@ function OrdersScreen({ theme, nav }) {
 }
 
 const ORDERS = [
-  { id: 'CG20260514-0938', station: '金牛苑南门车棚', status: '充电中', plug: 'A-03', duration: '02:18:24', date: '今天 08:30', amount: '¥1.37', kwh: '0.37度' },
-  { id: 'CG20260513-1842', station: '蓝桥科技园 B 座', status: '已完成', plug: 'B-07', duration: '04:00:00', date: '昨天 14:20', amount: '¥2.43', kwh: '0.72度' },
-  { id: 'CG20260512-2210', station: '金牛苑南门车棚', status: '已完成', plug: 'A-01', duration: '02:15:30', date: '5月12日', amount: '¥1.33', kwh: '0.34度' },
-  { id: 'CG20260510-0712', station: '滨河新村东区',   status: '异常',   plug: 'C-04', duration: '00:08:12', date: '5月10日', amount: '¥0.09', kwh: '0.03度' },
-  { id: 'CG20260508-1606', station: '蓝桥科技园 B 座', status: '已完成', plug: 'B-12', duration: '03:42:00', date: '5月8日',  amount: '¥2.25', kwh: '0.67度' },
+  { id: 'CG20260514-0938', station: '金牛苑南门车棚', status: '充电中', plug: 'A-03', mode: '按功率计费', duration: '02:18:24', date: '今天 08:30', amount: '¥1.37', kwh: '0.37度' },
+  { id: 'CG20260513-1842', station: '蓝桥科技园 B 座', status: '已完成', plug: 'B-07', mode: '按功率计费', duration: '04:00:00', date: '昨天 14:20', amount: '¥2.43', kwh: '0.72度' },
+  { id: 'CG20260512-2210', station: '金牛苑南门车棚', status: '已完成', plug: 'A-01', mode: '按功率计费', duration: '02:15:30', date: '5月12日', amount: '¥1.33', kwh: '0.34度' },
+  { id: 'CG20260510-0712', station: '滨河新村东区',   status: '异常',   plug: 'C-04', mode: '按功率计费', duration: '00:08:12', date: '5月10日', amount: '¥0.09', kwh: '0.03度' },
+  { id: 'CG20260508-1606', station: '蓝桥科技园 B 座', status: '已完成', plug: 'B-12', mode: '按功率计费', duration: '03:42:00', date: '5月8日',  amount: '¥2.25', kwh: '0.67度' },
 ];
 
 // ─── OrderDetailScreen (H5) ──────────────────────────────────────

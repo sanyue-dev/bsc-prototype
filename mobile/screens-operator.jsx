@@ -5,7 +5,7 @@
 //   OpTicketsScreen     故障工单
 
 // ─── OpDashboardScreen ────────────────────────────────────────────
-function OpDashboardScreen({ theme, nav }) {
+function OpDashboardScreen({ theme, nav, onRoleSwitch }) {
   return (
     <>
       <NativeTitleBar title="运营看板" theme={theme}/>
@@ -120,6 +120,35 @@ function OpDashboardScreen({ theme, nav }) {
               <span style={{ fontSize: 10, color: theme.textDim }}>{a.when}</span>
             </Card>
           ))}
+
+          {/* ── role switcher ── */}
+          <div
+            onClick={() => onRoleSwitch && onRoleSwitch('owner')}
+            style={{
+              marginTop: 4,
+              display: 'flex', alignItems: 'center', gap: 14,
+              padding: '14px 16px', borderRadius: 14,
+              background: theme.surface,
+              border: `1px solid ${theme.line}`,
+              cursor: 'pointer',
+            }}
+          >
+            <div style={{
+              width: 38, height: 38, borderRadius: 10, flexShrink: 0,
+              background: theme.bg0,
+              border: `1px solid ${theme.line}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Icon name="home" size={18} color={theme.textMuted}/>
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: theme.text }}>切换至车主端</div>
+              <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 2 }}>扫码充电 · 查看订单</div>
+            </div>
+            <svg width="6" height="10" viewBox="0 0 6 10" fill="none" style={{ opacity: 0.25, flexShrink: 0 }}>
+              <path d="M1 1l4 4-4 4" stroke={theme.text} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
         </div>
       </ScreenBody>
       <OperatorTabBar active="op-dashboard" onTab={nav} theme={theme}/>
@@ -287,23 +316,27 @@ function OpDevicesScreen({ theme, nav }) {
             <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: 'repeat(20, 1fr)', gap: 3 }}>
               {Array.from({ length: 80 }).map((_, i) => {
                 const r = (i * 7 + tick) % 100;
-                const s = r < 70 ? 'charge' : r < 90 ? 'free' : r < 95 ? 'off' : 'err';
-                const c = s === 'charge' ? theme.primary
-                       : s === 'free'   ? theme.success
-                       : s === 'off'    ? theme.textDim
-                       :                  theme.danger;
+                const s = r < 60 ? 'charge' : r < 82 ? 'free' : r < 88 ? 'partial' : r < 93 ? 'off' : r < 97 ? 'maint' : 'err';
+                const c = s === 'charge'  ? theme.primary
+                       : s === 'free'    ? theme.success
+                       : s === 'partial' ? theme.warning
+                       : s === 'maint'   ? '#9b59b6'
+                       : s === 'off'     ? theme.textDim
+                       :                   theme.danger;
                 return (
                   <div key={i} style={{
                     aspectRatio: '1/1', borderRadius: 2,
-                    background: `${c}${s === 'off' ? '40' : '88'}`,
+                    background: `${c}${s === 'off' ? '40' : s === 'maint' ? '60' : '88'}`,
                     transition: 'background .8s ease',
                   }}/>
                 );
               })}
             </div>
-            <div style={{ display: 'flex', gap: 14, marginTop: 12, fontSize: 11, color: theme.textMuted }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 12px', marginTop: 12, fontSize: 11, color: theme.textMuted }}>
               <span><span style={{ color: theme.primary }}>■</span> 充电中</span>
               <span><span style={{ color: theme.success }}>■</span> 空闲</span>
+              <span><span style={{ color: theme.warning }}>■</span> 部分可用</span>
+              <span><span style={{ color: '#9b59b6' }}>■</span> 维护中</span>
               <span><span style={{ color: theme.textDim }}>■</span> 离线</span>
               <span><span style={{ color: theme.danger }}>■</span> 故障</span>
             </div>

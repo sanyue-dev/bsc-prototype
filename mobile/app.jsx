@@ -48,6 +48,8 @@ function App() {
   const screen = screens.find(s => s.id === current) || screens[0];
   const Screen = window[screen.comp];
 
+  const switchRole = (r) => setTweak('role', r);
+
   // navigate handler – supports tab IDs that also live in the registry
   const nav = (id) => {
     if (!id) return;
@@ -87,7 +89,7 @@ function App() {
             background: theme.bg1,
             color: theme.text,
           }}>
-            <Screen theme={theme} nav={nav}/>
+            <Screen theme={theme} nav={nav} onRoleSwitch={switchRole}/>
           </div>
         </IOSDevice>
         <div style={{
