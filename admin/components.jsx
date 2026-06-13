@@ -55,6 +55,8 @@ const ADMIN_NAV = [
   { id: 'pricing',   label: '计费配置' },
   { id: 'users',     label: '用户管理' },
   { id: 'coupons',   label: '优惠券管理' },
+  { id: 'roles',     label: '角色管理' },
+  { id: 'perms',     label: '权限管理' },
 ]
 
 const ADMIN_NAV_GROUPS = [
@@ -78,6 +80,12 @@ const ADMIN_NAV_GROUPS = [
     icon: icons.SettingOutlined,
     children: ['pricing', 'users', 'coupons'],
   },
+  {
+    id: 'system',
+    label: '系统管理',
+    icon: icons.SafetyOutlined,
+    children: ['roles', 'perms'],
+  },
 ]
 
 const ADMIN_NAV_ICONS = {
@@ -91,6 +99,8 @@ const ADMIN_NAV_ICONS = {
   pricing:   icons.DollarCircleOutlined,
   users:     icons.UserOutlined,
   coupons:   icons.GiftOutlined,
+  roles:     icons.TeamOutlined,
+  perms:     icons.SafetyOutlined,
 }
 
 // ─── Logout ───────────────────────────────────────────────────────
@@ -468,85 +478,98 @@ function StatCard({ label, value, unit, delta, up, accentColor, icon }) {
   )
 }
 
-// ─── Charts（自定义 SVG） ─────────────────────────────────────────
+// ─── Charts（ECharts + antd 风格 tooltip） ────────────────────────
+
+// 通用 ECharts 容器：自动 init / resize / dispose
+function EChartBase({ option, height, style }) {
+  const ref  = React.useRef(null)
+  const inst = React.useRef(null)
+
+  React.useEffect(() => {
+    if (!ref.current || !window.echarts) return
+    inst.current = echarts.init(ref.current, null, { renderer: 'canvas' })
+    inst.current.setOption(option)
+    const ro = new ResizeObserver(() => inst.current && inst.current.resize())
+    ro.observe(ref.current)
+    return () => { ro.disconnect(); inst.current && inst.current.dispose() }
+  }, [])
+
+  React.useEffect(() => {
+    if (inst.current) inst.current.setOption(option, { notMerge: false })
+  }, [JSON.stringify(option)])
+
+  return <div ref={ref} style={{ width: '100%', height, ...style }}></div>
+}
+
+// 共用配置
+function baseGrid() {
+  return { top: 10, right: 8, bottom: 28, left: 8, containLabel: true }
+}
+function baseAxisLabel() {
+  return { fontSize: 11, color: ADMIN.textSecondary, margin: 6 }
+}
+function baseSplitLine() {
+  return { lineStyle: { color: ADMIN.borderLight, type: 'dashed' } }
+}
+// antd Tooltip 风格（深色、圆角，与 antd.Tooltip 视觉一致）
+function antdTip(formatter) {
+  return {
+    trigger: 'axis',
+    backgroundColor: 'rgba(0,0,0,0.85)',
+    borderWidth: 0,
+    padding: [6, 10],
+    textStyle: { fontSize: 12, color: '#fff' },
+    extraCssText: 'border-radius:6px;box-shadow:0 3px 8px rgba(0,0,0,0.18);',
+    formatter,
+  }
+}
+
+// BarChart：data = [{label, v}]
 function BarChart({ data, height = 150, color }) {
-  const c   = color || ADMIN.primary
-  const max = Math.max(...data.map(d => d.v))
-  const W = 500, H = height, n = data.length
-  const slot = W / n
-  const barW = Math.floor(slot * 0.52)
-  return (
-    <svg viewBox={`0 0 ${W} ${H + 26}`} style={{ width: '100%', display: 'block' }}>
-      {[0.25, 0.5, 0.75, 1].map((f, i) => (
-        <line key={i} x1={0} y1={H * (1 - f * 0.9)} x2={W} y2={H * (1 - f * 0.9)}
-          stroke={ADMIN.borderLight} strokeWidth="1"/>
-      ))}
-      {data.map((d, i) => {
-        const bh = (d.v / max) * H * 0.88
-        const x  = i * slot + (slot - barW) / 2
-        return (
-          <g key={i}>
-            <rect x={x} y={H - bh} width={barW} height={bh} rx="3" fill={c} opacity={i === n - 1 ? 1 : 0.55}/>
-            <text x={x + barW / 2} y={H + 18} textAnchor="middle" fontSize="11" fill={ADMIN.textSecondary}>{d.label}</text>
-          </g>
-        )
-      })}
-    </svg>
-  )
+  const c = color || ADMIN.primary
+  const option = {
+    animation: true,
+    grid: baseGrid(),
+    tooltip: { ...antdTip(p => `${p[0].name}　${p[0].value.toLocaleString()}`), axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(0,0,0,0.04)' } } },
+    xAxis: { type: 'category', data: data.map(d => d.label), axisLine: { show: false }, axisTick: { show: false }, axisLabel: baseAxisLabel() },
+    yAxis: { type: 'value', splitLine: baseSplitLine(), axisLabel: { ...baseAxisLabel(), formatter: v => v >= 1000 ? `${(v/1000).toFixed(0)}k` : v } },
+    series: [{ type: 'bar', data: data.map((d, i) => ({ value: d.v, itemStyle: { color: c, opacity: i === data.length-1 ? 1 : 0.6, borderRadius: [3,3,0,0] } })), barMaxWidth: 36 }],
+  }
+  return <EChartBase option={option} height={height}/>
 }
 
+// LineChart：data = [{label, v}]
 function LineChart({ data, height = 150, color }) {
-  const c   = color || ADMIN.primary
-  const max = Math.max(...data.map(d => d.v))
-  const min = Math.min(...data.map(d => d.v)) * 0.88
-  const W = 500, H = height, n = data.length
-  const px = i => (i / (n - 1)) * (W - 40) + 20
-  const py = v => H - ((v - min) / (max - min || 1)) * H * 0.82 - 8
-  const path = data.map((d, i) => `${i === 0 ? 'M' : 'L'}${px(i)},${py(d.v)}`).join(' ')
-  const fill = `${path} L${px(n-1)},${H + 4} L${px(0)},${H + 4}Z`
-  const uid  = c.replace('#', '')
-  return (
-    <svg viewBox={`0 0 ${W} ${H + 26}`} style={{ width: '100%', display: 'block' }}>
-      <defs>
-        <linearGradient id={`lg${uid}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={c} stopOpacity="0.18"/>
-          <stop offset="100%" stopColor={c} stopOpacity="0.01"/>
-        </linearGradient>
-      </defs>
-      {[0.25, 0.5, 0.75].map((f, i) => (
-        <line key={i} x1={20} y1={py(min + (max - min) * f)} x2={W - 20} y2={py(min + (max - min) * f)}
-          stroke={ADMIN.borderLight} strokeWidth="1" strokeDasharray="4 4"/>
-      ))}
-      <path d={fill} fill={`url(#lg${uid})`}/>
-      <path d={path} stroke={c} strokeWidth="2" fill="none" strokeLinejoin="round" strokeLinecap="round"/>
-      {data.map((d, i) => (
-        <g key={i}>
-          <circle cx={px(i)} cy={py(d.v)} r="3.5" fill={c} stroke="#fff" strokeWidth="1.5"/>
-          <text x={px(i)} y={H + 19} textAnchor="middle" fontSize="11" fill={ADMIN.textSecondary}>{d.label}</text>
-        </g>
-      ))}
-    </svg>
-  )
+  const c = color || ADMIN.primary
+  const option = {
+    animation: true,
+    grid: baseGrid(),
+    tooltip: antdTip(p => `${p[0].name}　${p[0].value.toLocaleString()}`),
+    xAxis: { type: 'category', data: data.map(d => d.label), axisLine: { show: false }, axisTick: { show: false }, axisLabel: baseAxisLabel(), boundaryGap: false },
+    yAxis: { type: 'value', splitLine: baseSplitLine(), axisLabel: { ...baseAxisLabel(), formatter: v => v >= 1000 ? `${(v/1000).toFixed(0)}k` : v } },
+    series: [{ type: 'line', data: data.map(d => d.v), smooth: true, symbol: 'circle', symbolSize: 6,
+      lineStyle: { color: c, width: 2 }, itemStyle: { color: c, borderColor: '#fff', borderWidth: 2 },
+      areaStyle: { color: { type: 'linear', x:0, y:0, x2:0, y2:1, colorStops: [{ offset:0, color: c+'30' }, { offset:1, color: c+'05' }] } } }],
+  }
+  return <EChartBase option={option} height={height}/>
 }
 
+// MiniDonut：segments = [{label, value, color, _n?}]
 function MiniDonut({ segments, size = 110 }) {
-  const cx = size / 2, cy = size / 2, r = size * 0.33
-  const C   = 2 * Math.PI * r
-  const total = segments.reduce((s, d) => s + d.value, 0)
-  let consumed = 0
-  return (
-    <svg width={size} height={size} style={{ transform: 'rotate(-90deg)', flexShrink: 0 }}>
-      {segments.map((seg, i) => {
-        const len = (seg.value / total) * C
-        const da  = `${len} ${C - len}`
-        const off = -consumed
-        consumed += len
-        return <circle key={i} cx={cx} cy={cy} r={r} fill="none"
-          stroke={seg.color} strokeWidth={size * 0.13}
-          strokeDasharray={da} strokeDashoffset={off}/>
-      })}
-    </svg>
-  )
+  const weights = segments.map((s) => {
+    if (typeof s._n === 'number') return s._n
+    if (typeof s.value === 'number') return s.value
+    const m = String(s.value).replace(/,/g, '').match(/^[\d.]+/)
+    const n = m ? parseFloat(m[0]) : NaN
+    return isNaN(n) || n === 0 ? 1 : n
+  })
+  const option = {
+    animation: false,
+    series: [{ type: 'pie', radius: ['52%','72%'], center: ['50%','50%'],
+      data: segments.map((s, i) => ({ value: weights[i], name: s.label, itemStyle: { color: s.color } })),
+      label: { show: false }, labelLine: { show: false }, emphasis: { scale: false } }],
+  }
+  return <div style={{ flexShrink: 0 }}><EChartBase option={option} height={size} style={{ width: size }}/></div>
 }
 
 // ─── SearchableMultiSelect ────────────────────────────────────────
