@@ -478,84 +478,151 @@ function StatCard({ label, value, unit, delta, up, accentColor, icon }) {
   )
 }
 
-// ─── Charts（ECharts + antd 风格 tooltip） ────────────────────────
-
-// 通用 ECharts 容器：自动 init / resize / dispose
-function EChartBase({ option, height, style }) {
-  const ref  = React.useRef(null)
-  const inst = React.useRef(null)
-
-  React.useEffect(() => {
-    if (!ref.current || !window.echarts) return
-    inst.current = echarts.init(ref.current, null, { renderer: 'canvas' })
-    inst.current.setOption(option)
-    const ro = new ResizeObserver(() => inst.current && inst.current.resize())
-    ro.observe(ref.current)
-    return () => { ro.disconnect(); inst.current && inst.current.dispose() }
-  }, [])
-
-  React.useEffect(() => {
-    if (inst.current) inst.current.setOption(option, { notMerge: false })
-  }, [JSON.stringify(option)])
-
-  return <div ref={ref} style={{ width: '100%', height, ...style }}></div>
-}
-
-// 共用配置
-function baseGrid() {
-  return { top: 10, right: 8, bottom: 28, left: 8, containLabel: true }
-}
-function baseAxisLabel() {
-  return { fontSize: 11, color: ADMIN.textSecondary, margin: 6 }
-}
-function baseSplitLine() {
-  return { lineStyle: { color: ADMIN.borderLight, type: 'dashed' } }
-}
-// antd Tooltip 风格（深色、圆角，与 antd.Tooltip 视觉一致）
-function antdTip(formatter) {
-  return {
-    trigger: 'axis',
-    backgroundColor: 'rgba(0,0,0,0.85)',
-    borderWidth: 0,
-    padding: [6, 10],
-    textStyle: { fontSize: 12, color: '#fff' },
-    extraCssText: 'border-radius:6px;box-shadow:0 3px 8px rgba(0,0,0,0.18);',
-    formatter,
-  }
-}
+// ─── Charts（G2Plot / Ant Design Charts 底层） ────────────────────
 
 // BarChart：data = [{label, v}]
 function BarChart({ data, height = 150, color }) {
+  const ref = React.useRef(null)
+  const chartRef = React.useRef(null)
   const c = color || ADMIN.primary
-  const option = {
-    animation: true,
-    grid: baseGrid(),
-    tooltip: { ...antdTip(p => `${p[0].name}　${p[0].value.toLocaleString()}`), axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(0,0,0,0.04)' } } },
-    xAxis: { type: 'category', data: data.map(d => d.label), axisLine: { show: false }, axisTick: { show: false }, axisLabel: baseAxisLabel() },
-    yAxis: { type: 'value', splitLine: baseSplitLine(), axisLabel: { ...baseAxisLabel(), formatter: v => v >= 1000 ? `${(v/1000).toFixed(0)}k` : v } },
-    series: [{ type: 'bar', data: data.map((d, i) => ({ value: d.v, itemStyle: { color: c, opacity: i === data.length-1 ? 1 : 0.6, borderRadius: [3,3,0,0] } })), barMaxWidth: 36 }],
-  }
-  return <EChartBase option={option} height={height}/>
+
+  React.useEffect(() => {
+    if (!ref.current || !window.G2Plot) return
+
+    // 先销毁旧图表
+    if (chartRef.current) {
+      try {
+        chartRef.current.destroy()
+      } catch(e) {}
+      chartRef.current = null
+    }
+
+    const chartData = data.map(d => ({ label: d.label, value: d.v }))
+    chartRef.current = new G2Plot.Column(ref.current, {
+      data: chartData,
+      xField: 'label',
+      yField: 'value',
+      height,
+      autoFit: true,
+      padding: [10, 8, 28, 8],
+      appendPadding: [0, 0, 0, 0],
+      animation: { appear: { animation: 'fade-in', duration: 300 } },
+      columnStyle: { radius: [3, 3, 0, 0], fill: c },
+      maxColumnWidth: 36,
+      xAxis: {
+        line: null,
+        tickLine: null,
+        label: { style: { fontSize: 11, fill: ADMIN.textSecondary } }
+      },
+      yAxis: {
+        grid: { line: { style: { stroke: ADMIN.borderLight, lineDash: [4, 4] } } },
+        label: {
+          style: { fontSize: 11, fill: ADMIN.textSecondary },
+          formatter: v => v >= 1000 ? `${(v/1000).toFixed(0)}k` : v
+        }
+      },
+      tooltip: {
+        customContent: (title, items) => {
+          if (!items || items.length === 0) return ''
+          const val = items[0]?.data?.value || 0
+          return `<div style="padding:6px 10px;font-size:12px;">${title}　${val.toLocaleString()}</div>`
+        }
+      }
+    })
+    chartRef.current.render()
+
+    return () => {
+      if (chartRef.current) {
+        try {
+          chartRef.current.destroy()
+        } catch(e) {}
+        chartRef.current = null
+      }
+    }
+  }, [JSON.stringify(data), height, c])
+
+  return <div ref={ref} style={{ width: '100%', height }}></div>
 }
 
 // LineChart：data = [{label, v}]
 function LineChart({ data, height = 150, color }) {
+  const ref = React.useRef(null)
+  const chartRef = React.useRef(null)
   const c = color || ADMIN.primary
-  const option = {
-    animation: true,
-    grid: baseGrid(),
-    tooltip: antdTip(p => `${p[0].name}　${p[0].value.toLocaleString()}`),
-    xAxis: { type: 'category', data: data.map(d => d.label), axisLine: { show: false }, axisTick: { show: false }, axisLabel: baseAxisLabel(), boundaryGap: false },
-    yAxis: { type: 'value', splitLine: baseSplitLine(), axisLabel: { ...baseAxisLabel(), formatter: v => v >= 1000 ? `${(v/1000).toFixed(0)}k` : v } },
-    series: [{ type: 'line', data: data.map(d => d.v), smooth: true, symbol: 'circle', symbolSize: 6,
-      lineStyle: { color: c, width: 2 }, itemStyle: { color: c, borderColor: '#fff', borderWidth: 2 },
-      areaStyle: { color: { type: 'linear', x:0, y:0, x2:0, y2:1, colorStops: [{ offset:0, color: c+'30' }, { offset:1, color: c+'05' }] } } }],
-  }
-  return <EChartBase option={option} height={height}/>
+
+  React.useEffect(() => {
+    if (!ref.current || !window.G2Plot) return
+
+    // 先销毁旧图表
+    if (chartRef.current) {
+      try {
+        chartRef.current.destroy()
+      } catch(e) {}
+      chartRef.current = null
+    }
+
+    const chartData = data.map(d => ({ label: d.label, value: d.v }))
+    chartRef.current = new G2Plot.Line(ref.current, {
+      data: chartData,
+      xField: 'label',
+      yField: 'value',
+      height,
+      autoFit: true,
+      padding: [10, 8, 28, 8],
+      appendPadding: [0, 0, 0, 0],
+      animation: { appear: { animation: 'fade-in', duration: 300 } },
+      smooth: true,
+      lineStyle: { stroke: c, lineWidth: 2 },
+      point: {
+        size: 3,
+        shape: 'circle',
+        style: { fill: c, stroke: '#fff', lineWidth: 2 }
+      },
+      area: {
+        style: {
+          fill: `l(270) 0:${c}30 1:${c}05`,
+        }
+      },
+      xAxis: {
+        line: null,
+        tickLine: null,
+        label: { style: { fontSize: 11, fill: ADMIN.textSecondary } }
+      },
+      yAxis: {
+        grid: { line: { style: { stroke: ADMIN.borderLight, lineDash: [4, 4] } } },
+        label: {
+          style: { fontSize: 11, fill: ADMIN.textSecondary },
+          formatter: v => v >= 1000 ? `${(v/1000).toFixed(0)}k` : v
+        }
+      },
+      tooltip: {
+        customContent: (title, items) => {
+          if (!items || items.length === 0) return ''
+          const val = items[0]?.data?.value || 0
+          return `<div style="padding:6px 10px;font-size:12px;">${title}　${val.toLocaleString()}</div>`
+        }
+      }
+    })
+    chartRef.current.render()
+
+    return () => {
+      if (chartRef.current) {
+        try {
+          chartRef.current.destroy()
+        } catch(e) {}
+        chartRef.current = null
+      }
+    }
+  }, [JSON.stringify(data), height, c])
+
+  return <div ref={ref} style={{ width: '100%', height }}></div>
 }
 
 // MiniDonut：segments = [{label, value, color, _n?}]
 function MiniDonut({ segments, size = 110 }) {
+  const ref = React.useRef(null)
+  const chartRef = React.useRef(null)
+
   const weights = segments.map((s) => {
     if (typeof s._n === 'number') return s._n
     if (typeof s.value === 'number') return s.value
@@ -563,13 +630,54 @@ function MiniDonut({ segments, size = 110 }) {
     const n = m ? parseFloat(m[0]) : NaN
     return isNaN(n) || n === 0 ? 1 : n
   })
-  const option = {
-    animation: false,
-    series: [{ type: 'pie', radius: ['52%','72%'], center: ['50%','50%'],
-      data: segments.map((s, i) => ({ value: weights[i], name: s.label, itemStyle: { color: s.color } })),
-      label: { show: false }, labelLine: { show: false }, emphasis: { scale: false } }],
-  }
-  return <div style={{ flexShrink: 0 }}><EChartBase option={option} height={size} style={{ width: size }}/></div>
+
+  React.useEffect(() => {
+    if (!ref.current || !window.G2Plot) return
+
+    // 先销毁旧图表
+    if (chartRef.current) {
+      try {
+        chartRef.current.destroy()
+      } catch(e) {}
+      chartRef.current = null
+    }
+
+    const chartData = segments.map((s, i) => ({
+      type: s.label,
+      value: weights[i]
+    }))
+
+    chartRef.current = new G2Plot.Pie(ref.current, {
+      data: chartData,
+      angleField: 'value',
+      colorField: 'type',
+      radius: 0.72,
+      innerRadius: 0.52,
+      width: size,
+      height: size,
+      padding: 0,
+      appendPadding: 0,
+      animation: false,
+      color: segments.map(s => s.color),
+      label: false,
+      legend: false,
+      tooltip: false,
+      statistic: null,
+      interactions: []
+    })
+    chartRef.current.render()
+
+    return () => {
+      if (chartRef.current) {
+        try {
+          chartRef.current.destroy()
+        } catch(e) {}
+        chartRef.current = null
+      }
+    }
+  }, [JSON.stringify(segments), size])
+
+  return <div style={{ flexShrink: 0, width: size, height: size }} ref={ref}></div>
 }
 
 // ─── SearchableMultiSelect ────────────────────────────────────────
