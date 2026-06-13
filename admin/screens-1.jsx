@@ -151,18 +151,6 @@ function DashboardScreen({ nav }) {
           <StatCard label="活跃故障工单" value={String(liveFaults)} unit="单" accentColor={ADMIN.panelRed}
             icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/><path d="M12 9v4M12 17h.01" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>}/>
         </div>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8 }}>
-          {[
-            {label:'在线',   count:DEVICE_STATUS_COUNTS['在线'],   color:ADMIN.successColor, bg:ADMIN.successBg},
-            {label:'维护中', count:DEVICE_STATUS_COUNTS['维护中'], color:'#7c5cbf',           bg:'#f5f3ff'},
-            {label:'离线',   count:DEVICE_STATUS_COUNTS['离线'],   color:ADMIN.textSecondary, bg:ADMIN.bodyBg},
-          ].map(s => (
-            <div key={s.label} style={{ background:s.bg, border:`1px solid ${ADMIN.borderLight}`, borderRadius:6, padding:'10px 0', textAlign:'center' }}>
-              <div style={{ fontSize:24, fontWeight:700, color:s.color, fontVariantNumeric:'tabular-nums' }}>{s.count}</div>
-              <div style={{ fontSize:11.5, color:ADMIN.textSecondary, marginTop:3 }}>{s.label}</div>
-            </div>
-          ))}
-        </div>
       </section>
 
       <section>
