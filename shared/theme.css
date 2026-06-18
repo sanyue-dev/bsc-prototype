@@ -3,7 +3,7 @@
  * eco 绿主题，供 landing.html 和 mobile 端共用
  *
  * landing.html  → <link rel="stylesheet" href="shared/theme.css">
- * mobile/ui.jsx → THEMES.eco 对象镜像此文件的值（JS 运行时需要），两者保持同步
+ * mobile/vue-app.js 直接消费这些设计 Token，保持视觉语言同步
  */
 
 :root {

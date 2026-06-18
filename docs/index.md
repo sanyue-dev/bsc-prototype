@@ -24,16 +24,6 @@
 
 | 文件 | 对应端 |
 |---|---|
-| `mobile/app.jsx` `mobile/ui.jsx` | 小程序公共组件 |
-| `mobile/screens-core.jsx` | 小程序车主端核心屏（首页/扫码/地图/站点详情）|
-| `mobile/screens-charging.jsx` | 小程序充电流程（确认/充电中/完成/订单）|
-| `mobile/screens-h5.jsx` | 小程序 H5 工具页（钱包/优惠券/个人中心等）|
-| `mobile/screens-operator.jsx` | 小程序运营商端 |
-| `mobile/ios-frame.jsx` `mobile/tweaks-panel.jsx` | 小程序框架组件 |
-| `admin/components.jsx` | 后台公共组件 |
-| `admin/login.jsx` | 后台登录页 |
-| `admin/screens-1.jsx` | 后台：看板/站点/设备/工单/订单 |
-| `admin/screens-2.jsx` | 后台：计费/用户/优惠券 |
-| `admin/screens-3.jsx` | 后台：充电会话 |
-| `admin/screens-4.jsx` | 后台：报表中心（收入/订单/设备/用户）|
-| `shared/design-canvas.jsx` | 设计画布（多方案对比）|
+| `mobile/vue-app.js` | 小程序车主端 18 屏 + 运营商端 5 屏，Vue 3 + Element Plus |
+| `admin/vue-app.js` | 后台登录、布局、12 个管理屏，Vue 3 + Element Plus |
+| `shared/theme.css` | 落地页与小程序共享设计 Token |
